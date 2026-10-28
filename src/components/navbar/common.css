@@ -1,0 +1,234 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: montserrat, sans-serif;
+    background-color: #f9faf2;
+}
+
+.flexing {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+button {
+    text-decoration: none;
+    border: none;
+    background: none;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ==========================================
+   ACTIVE NAVBAR LINK STYLING (DESKTOP & MOBILE)
+========================================== */
+.menu-item-link.active-menu-item .menu-nav-btn,
+.menu-item-link.active .menu-nav-btn {
+    background-color: #3b6934 !important;
+    color: #ffffff !important;
+    font-weight: 700;
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        flex-wrap: wrap;
+        justify-content: space-between;
+        height: auto;
+        padding: 10px 0;
+    }
+
+    /* Fixed Bottom Dock Configuration */
+    .menu {
+        width: 100% !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        height: 60px !important;
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-around !important;
+        align-items: center !important;
+        padding: 0 5px !important;
+        background-color: #ffffff !important;
+        z-index: 9999 !important;
+        box-shadow: 0px -4px 15px rgba(0, 0, 0, 0.1) !important;
+        border-top: 1px solid #e2e8df;
+        margin: 0 !important;
+    }
+
+    .menu-item-link {
+        flex: 1;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+    }
+
+    /* Stack icon directly above the text label cleanly */
+    .menu-nav-btn {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border: none !important;
+        background: transparent !important;
+        width: 100% !important;
+        height: 50px !important;
+        padding: 2px 0 !important;
+        margin: 0 !important;
+        border-radius: 8px !important;
+        color: #666666 !important;
+    }
+
+    .mobile-icon {
+        display: block !important;
+        font-size: 1.25rem !important;
+        margin-bottom: 2px !important;
+        line-height: 1;
+    }
+
+    .menu-text {
+        font-size: 10px !important;
+        font-weight: 500 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        max-width: 100% !important;
+        line-height: 1;
+    }
+
+    /* Active State Styling on Mobile */
+    .menu-item-link.active-menu-item .menu-nav-btn,
+    .menu-item-link.active .menu-nav-btn {
+        background-color: #eef7ed !important;
+        color: #3b6934 !important;
+        font-weight: 700;
+    }
+
+    .menu-item-link.active-menu-item .mobile-icon,
+    .menu-item-link.active .mobile-icon {
+        color: #3b6934 !important;
+    }
+
+    .search {
+        order: 1;
+        width: 80%;
+        margin-bottom: 10px;
+        height: 40px;
+    }
+
+    .register {
+        display: none;
+    }
+
+    .features {
+        width: 20%;
+        justify-content: space-evenly;
+        padding: 10px 10px;
+    }
+
+    .hero {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+    }
+
+    .hero > div {
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    .hero-left {
+        align-items: flex-start;
+        justify-content: flex-start;
+        margin: 0;
+    }
+
+    .hero-btn {
+        display: inline-block;
+        width: 100px;
+    }
+
+    .hero-4 {
+        display: flex;
+    }
+
+    .category-heading > div {
+        font-size: 3vw;
+        color: #3b6934;
+        font-weight: bold;
+    }
+
+    #cate-head {
+        font-size: 4vw;
+    }
+
+    #differances {
+        width: 92vw;
+        margin: auto;
+    }
+
+    .differances-container > div {
+        width: 95%;
+    }
+
+    .line {
+        visibility: hidden;
+    }
+
+    #steps-heading {
+        font-size: 6vw;
+    }
+
+    .support-btns {
+        flex-direction: column;
+        height: 300px;
+    }
+
+    .support > h1 {
+        width: 90vw;
+    }
+
+    .support > div {
+        width: 100%;
+    }
+
+    .support-btns > button {
+        width: 200px;
+    }
+
+    .login-img {
+        display: none;
+    }
+
+    .login-page > div {
+        width: 100%;
+    }
+
+    #login-card {
+        width: 100%;
+    }
+
+    .register-right {
+        display: none;
+    }
+
+    #rigister-left {
+        width: 100vw;
+        overflow-x: hidden;
+    }
+
+    #inner-container {
+        width: 100%;
+    }
+
+    /* Prevent bottom content from hiding behind the fixed mobile dock */
+    .home, .farmer-page, .orders-page, .inventory-page {
+        padding-bottom: 75px !important;
+    }
+}

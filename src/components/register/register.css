@@ -1,0 +1,205 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Work+Sans:wght@400;500;600&display=swap');
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+.register-page {
+    min-height: 100vh;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    z-index: 100;
+    background-color: #f9faf2;
+}
+
+.register-right {
+    background-image: linear-gradient(rgba(59, 105, 52, 0.4), rgba(59, 105, 52, 0.4)), url("https://lh3.googleusercontent.com/aida-public/AB6AXuAWGvh-zJRy5U8M-lKWMqxTwHMzfkzleTrq9eO28FcEpxaa8OfEd_byJhce1OFGoroMLknHeiFO5O6RKkI5wPDo1khZhrpUgP25DPIby8XtQCCf8wYZWDrtYDVsotBxlQEPfNP1I9C4B6AmlJlv6DlIqXbvb0IIzZKr0A47df3AYWwFHhtwD4lfG0bjpQE0HhZiwL5yPzp21-9YBSV3BIbMI1iJlqZN_S83z3IfOSJA8QFlw2NXXcemIAzbiP0DLbzFWoDm0yLmFjA");
+    background-size: cover;
+    background-position: center;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+}
+
+.over-card{
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    height: 340px;
+    border-radius: 25px;
+    line-height: 28px;
+}
+
+.register-left {
+    background: white;
+    padding: 40px 60px;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.profile-pic{
+    height: 80px;
+    width: 80px;
+    background-color: #f3f4ed;
+    border-radius: 50%;
+    border: 2px dashed #3b6934;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.profile-pic:hover {
+    background-color: #e2e4dc;
+}
+
+.radio-btn input[type="radio"] {
+    display: none;
+}
+
+.radio-btn label{
+    flex: 1;
+    height: 70px;
+    border: #d4ded0 2px solid;
+    border-radius: 15px;
+    padding: 12px 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.radio-btn input[type="radio"]:checked + label {
+    border-color: #198754;
+    background: #f3f7f0;
+}
+
+.field-container1{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.field-container1 .inner-container {
+    width: 48%;
+}
+
+.field-text{
+    width: 100%;
+    height: 52px;
+    background-color: #f9faf2;
+    border: 1px solid #e2e4dc;
+    border-radius: 12px;
+    padding: 2px 12px;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.field-text:focus-within{
+    border: 2px solid #198754;
+    background-color: #fff;
+}
+
+.field-text input{
+    border: none;
+    outline: none;
+    width: 100%;
+    height: 100%;
+    background: none;
+    font-size: 14px;
+    color: #333;
+}
+
+.register-left::-webkit-scrollbar {
+    width: 6px;
+}
+
+.register-left::-webkit-scrollbar-thumb {
+    background: #198754;
+    border-radius: 10px;
+}
+
+/* ===========================
+   SUCCESS ANIMATION STYLES
+=========================== */
+.success-fade-out {
+    animation: fadeOutScale 0.6s ease forwards;
+}
+
+@keyframes fadeOutScale {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+.success-overlay-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    animation: fadeInSlide 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInSlide {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.success-icon-bounce {
+    animation: bounceEffect 0.8s infinite alternate cubic-bezier(0.3, 1.5, 0.6, 1);
+}
+
+@keyframes bounceEffect {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(-12px);
+    }
+}
+
+/* ===========================
+   RESPONSIVE BREAKPOINTS
+=========================== */
+@media (max-width: 992px) {
+    .register-page {
+        grid-template-columns: 1fr;
+    }
+
+    .register-right {
+        display: none !important;
+    }
+
+    .register-left {
+        height: 100vh;
+        padding: 30px 20px;
+    }
+
+    .field-container1 .inner-container {
+        width: 100%;
+    }
+}

@@ -1,0 +1,326 @@
+.order-history-container {
+  margin-top: 75px;
+  max-width: 1200px;
+}
+
+/* Scrollable Tabs */
+.order-tabs-scroll {
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: #dee2e6 transparent;
+}
+
+.order-tabs-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.order-tabs-scroll::-webkit-scrollbar-thumb {
+  background-color: #dee2e6;
+  border-radius: 4px;
+}
+
+.order-tab-pill {
+  font-size: 0.875rem;
+  padding: 8px 18px;
+  border-radius: 50rem;
+  font-weight: 500;
+  border: 1px solid #e0e0e0;
+  background-color: #ffffff;
+  color: #495057;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.order-tab-pill.active {
+  background-color: #198754;
+  color: #ffffff;
+  border-color: #198754;
+  box-shadow: 0 4px 10px rgba(25, 135, 84, 0.2);
+}
+
+.order-tab-pill:hover:not(.active) {
+  background-color: #f8f9fa;
+  border-color: #ced4da;
+  color: #198754;
+}
+
+/* Card Structure */
+.order-card {
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  transition: box-shadow 0.2s ease;
+}
+
+.order-card:hover {
+  box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Section Header Titles */
+.order-section-title {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #6c757d;
+  margin-bottom: 6px;
+}
+
+/* Status Badges */
+.order-badge {
+  padding: 4px 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 50rem;
+  letter-spacing: 0.5px;
+}
+
+.badge-delivered { background-color: #d1e7dd; color: #0f5132; }
+.badge-shipped { background-color: #cff4fc; color: #055160; }
+.badge-packing { background-color: #fff3cd; color: #664d03; }
+.badge-confirmed { background-color: #cfe2ff; color: #084298; }
+.badge-cancelled { background-color: #f8d7da; color: #842029; }
+.badge-pending { background-color: #fff3cd; color: #997404; }
+
+/* Step Tracker Mini Component */
+.order-step-tracker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.step-item {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #e9ecef;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.step-item.active {
+  background-color: #198754;
+  color: #fff;
+}
+
+.step-line {
+  width: 35px;
+  height: 3px;
+  background-color: #e9ecef;
+}
+
+/* Responsive Column Borders for Laptop Screens */
+@media (min-width: 992px) {
+  .border-end-lg {
+    border-right: 1px solid #e9ecef;
+    padding-right: 1.5rem;
+  }
+}
+.order-history-container {
+  margin-top: 75px;
+  max-width: 1200px;
+}
+
+/* Scrollable Tabs */
+.order-tabs-scroll {
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: #dee2e6 transparent;
+}
+
+.order-tabs-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.order-tabs-scroll::-webkit-scrollbar-thumb {
+  background-color: #dee2e6;
+  border-radius: 4px;
+}
+
+.order-tab-pill {
+  font-size: 0.875rem;
+  padding: 8px 18px;
+  border-radius: 50rem;
+  font-weight: 500;
+  border: 1px solid #e0e0e0;
+  background-color: #ffffff;
+  color: #495057;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.order-tab-pill.active {
+  background-color: #198754;
+  color: #ffffff;
+  border-color: #198754;
+  box-shadow: 0 4px 10px rgba(25, 135, 84, 0.2);
+}
+
+.order-tab-pill:hover:not(.active) {
+  background-color: #f8f9fa;
+  border-color: #ced4da;
+  color: #198754;
+}
+
+/* Custom Order Container (No Bootstrap Card) */
+.custom-order-card {
+  border-radius: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.03);
+  transition: box-shadow 0.2s ease;
+}
+
+.custom-order-card:hover {
+  box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.08);
+}
+
+.custom-empty-state {
+  border-radius: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.03);
+}
+
+/* Section Headings */
+.order-section-title {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #6c757d;
+  margin-bottom: 6px;
+}
+
+/* Status Badges */
+.order-badge {
+  padding: 4px 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 50rem;
+  letter-spacing: 0.5px;
+}
+
+.badge-delivered { background-color: #d1e7dd; color: #0f5132; }
+.badge-shipped { background-color: #cff4fc; color: #055160; }
+.badge-packing { background-color: #fff3cd; color: #664d03; }
+.badge-confirmed { background-color: #cfe2ff; color: #084298; }
+.badge-cancelled { background-color: #f8d7da; color: #842029; }
+.badge-pending { background-color: #fff3cd; color: #997404; }
+
+.track-btn {
+  max-width: 240px;
+}
+
+/* Desktop layout borders & spacing adjustments */
+@media (min-width: 992px) {
+  .order-col-border {
+    border-right: 1px solid #e9ecef;
+    padding-right: 1.5rem;
+  }
+}
+/* Flipkart Style Order Tracker */
+.order-track-steps {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  margin-left: 10px;
+}
+
+.order-track-steps::before {
+  content: '';
+  position: absolute;
+  top: 15px;
+  bottom: 15px;
+  left: 15px;
+  width: 3px;
+  background-color: #e9ecef;
+  z-index: 1;
+}
+
+.order-track-step {
+  display: flex;
+  align-items: flex-start;
+  position: relative;
+  padding-bottom: 25px;
+  z-index: 2;
+}
+
+.order-track-step:last-child {
+  padding-bottom: 0;
+}
+
+.order-track-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #e9ecef;
+  color: #adb5bd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  margin-right: 18px;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 2px #e9ecef;
+}
+
+.order-track-icon.completed {
+  background-color: #198754; /* Success Green */
+  color: #fff;
+  box-shadow: 0 0 0 2px #d1e7dd;
+}
+
+.order-track-text {
+  padding-top: 4px;
+}
+
+/* Mobile Horizontal Scrollable Profile Tabs */
+@media (max-width: 991px) {
+  .profile-nav-container {
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    margin-bottom: 15px;
+  }
+
+  .profile-nav-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .profile-nav-container .list-group {
+    display: flex;
+    flex-direction: row !important;
+    gap: 8px;
+    background: transparent !important;
+  }
+
+  .profile-nav-container .list-group-item {
+    border-radius: 50rem !important;
+    border: 1px solid #dee2e6 !important;
+    padding: 8px 16px !important;
+    font-size: 0.85rem;
+    background-color: #ffffff !important;
+  }
+
+  .profile-nav-container .list-group-item.bg-success {
+    background-color: #198754 !important;
+    color: #ffffff !important;
+    border-color: #198754 !important;
+  }
+}
+
+@media (min-width: 992px) {
+  .border-start-lg {
+    border-left: 4px solid #198754 !important;
+  }
+}

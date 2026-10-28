@@ -1,0 +1,53 @@
+:root {
+  --kisan-forest-green: #1b4d3e;
+  --kisan-leaf-green: #2e7d32;
+  --kisan-light-green: #e8f5e9;
+  --kisan-accent-orange: #f57c00;
+  --kisan-cream: #fbf9f4;
+  --kisan-dark: #2c3e50;
+  --kisan-gray: #7f8c8d;
+  --kisan-light-gray: #f8f9fa;
+  --kisan-border: #dcd7c9;
+}
+
+body {
+  background-color: var(--kisan-cream);
+  color: var(--kisan-dark);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Primary Button Overrides for Agricultural Theme */
+.btn-kisan-primary {
+  background-color: var(--kisan-leaf-green);
+  border-color: var(--kisan-leaf-green);
+  color: #ffffff;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-kisan-primary:hover {
+  background-color: var(--kisan-forest-green);
+  border-color: var(--kisan-forest-green);
+  color: #ffffff;
+}
+
+.btn-kisan-outline {
+  border: 2px solid var(--kisan-leaf-green);
+  color: var(--kisan-leaf-green);
+  background-color: transparent;
+  font-weight: 500;
+}
+
+.btn-kisan-outline:hover {
+  background-color: var(--kisan-leaf-green);
+  color: #ffffff;
+}
+
+/* Badge & Highlights */
+.badge-kisan {
+  background-color: var(--kisan-light-green);
+  color: var(--kisan-forest-green);
+  font-weight: 600;
+}

@@ -1,0 +1,138 @@
+.login-page {
+    margin: 0%;
+    padding: 10px;
+    width: 99vw;
+    height: 110vh;
+}
+.login-img {
+    height: 100%;
+    width: 50%;
+    background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDst7Ahf_NmNj7m9WnRo1N2IcufjRR8qKixOuBcEx1GE2VXKao9Rujue8XYZRruW6MxpnZHNrdMw1SH-uVQVQV7-XsfBHAqRceAZmj2nYFwfVSRnIQZuLzSVpY0P9-ER9tilmcPEMHOZMiifJQfNN1NYlN6U7zewDq66a-hTYEECuxdVOr74YZHPDLKj6PXJHRvCW_aUPLiS2wIo0D-2_ZInSZMn8Nr3jHGBN-8a_aE4Ent2084bdf4In53I3xa4zzIOoKi7t0GU-w');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow-x: hidden;
+}
+.login-container {
+    height: 100%;
+    width: 50%;
+    background-color: aliceblue;
+}
+.login-card {
+    width: 65%;
+    position: relative;
+    z-index: 10;
+    padding: 20px 0;
+    background-color: white;
+    border-radius: 20px;
+}
+.login-field input:focus + p,
+.login-field input:not(:placeholder-shown) + p {
+    transform: translateY(-20px);
+    font-size: 12px;
+    background: white;
+    padding: 0 5px;
+}
+.login-field > p {
+    position: absolute;
+    left: 60px;
+    top: 22px;
+    pointer-events: none;
+    color: #42493e;
+    transition: all 0.3s ease-in;
+}
+.login-field input {
+    padding: 0px 10px;
+    border: none;
+    outline: none;
+    width: 80%;
+    height: 100%;
+    background: none;
+    font-size: large;
+}
+.field-container {
+    width: 90%;
+}
+.login-field {
+    height: 60px;
+    width: 90%;
+    border: #42493e solid 2px;
+    border-radius: 15px;
+    position: relative;
+    background-color: aliceblue;
+}
+.login-btn {
+    background-color: #42493e;
+    color: aliceblue;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+.login-btn:hover {
+    background-color: #3b6934;
+}
+.forgot {
+    align-self: flex-end;
+    cursor: pointer;
+    font-size: 13px;
+    color: #555;
+}
+.forgot:hover {
+    text-decoration: underline;
+}
+.h-line {
+    height: 1px;
+    width: 30%;
+    background-color: #ccc;
+}
+.small-error {
+    font-size: 11px;
+    margin-top: 2px;
+    margin-left: 10px;
+}
+
+/* ===========================
+   ANIMATION & STATUS STYLES
+=========================== */
+.status-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    width: 90%;
+    animation: slideDown 0.4s ease forwards;
+}
+.status-success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+}
+.status-error {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #ef9a9a;
+}
+
+@keyframes slideDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Shake Animation for failed login attempts */
+.shake-animation {
+    animation: shake 0.4s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+}

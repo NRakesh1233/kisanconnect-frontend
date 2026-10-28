@@ -1,0 +1,62 @@
+
+.farmer-page {
+  min-height: 100vh;
+  background: #f8faf7;
+}
+
+.farmer-profile {
+  border: 1px solid #e2e9df;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.farmer-avatar {
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #d8ead7;
+}
+
+.product-card {
+  border: 1px solid #e5e9e2;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.product-image {
+  height: 175px;
+  object-fit: cover;
+  background: #edf1e9;
+}
+
+.product-card .card-title {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.product-card .btn-success {
+  background: #278344;
+  border-color: #278344;
+}
+
+.product-card .btn-success:hover {
+  background: #1d6935;
+}
+
+@media (max-width: 576px) {
+  .farmer-avatar {
+    width: 65px;
+    height: 65px;
+  }
+
+  .product-image {
+    height: 200px;
+  }
+}

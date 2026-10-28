@@ -1,0 +1,216 @@
+/* Customer Navbar Customizations */
+.customer-navbar {
+  background-color: var(--kisan-forest-green) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.customer-navbar .navbar-brand {
+  color: #ffffff !important;
+  font-weight: 700;
+  font-size: 1.4rem;
+  letter-spacing: 0.5px;
+}
+
+.customer-navbar .nav-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.customer-navbar .nav-link:hover,
+.customer-navbar .nav-link.active {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+/* ==========================================
+   LAPTOP ORDER HISTORY HORIZONTAL ROW FIX
+========================================== */
+
+/* Laptop / Desktop Horizontal Alignment */
+@media (min-width: 992px) {
+  .order-card-grid {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    gap: 15px;
+  }
+
+  /* Distribute the items neatly across the row */
+  .order-info-group {
+    flex: 1.5;
+    text-align: left !important;
+  }
+
+  .order-status-group {
+    flex: 1.2;
+    text-align: left !important;
+  }
+
+  .order-amount-group {
+    flex: 1.2;
+    text-align: left !important;
+  }
+
+  .order-action-group {
+    flex: 1;
+    text-align: right !important;
+  }
+}
+
+/* Mobile Screens (Phones & Tablets below 991px) */
+@media (max-width: 991px) {
+  .order-card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 16px 12px;
+  }
+
+  .order-info-group {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .order-status-group {
+    grid-column: 2;
+    grid-row: 1;
+    text-align: right;
+  }
+
+  .order-amount-group {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .order-action-group {
+    grid-column: 2;
+    grid-row: 2;
+    text-align: right;
+  }
+}
+
+/* Cart Badge Styling */
+.cart-badge {
+  font-size: 0.7rem;
+  padding: 0.35em 0.65em;
+}
+/* Cart Primary Action & Icon Colors */
+.btn-kisan-primary, 
+.cart-checkout-btn {
+  background-color: #3b6934 !important;
+  border-color: #3b6934 !important;
+  color: #ffffff !important;
+}
+
+.btn-kisan-primary:hover {
+  background-color: #2f5429 !important;
+  border-color: #2f5429 !important;
+}
+
+/* Search Bar in Navbar */
+.customer-search-input {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-color: var(--kisan-border);
+}
+
+.customer-search-btn {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  background-color: var(--kisan-accent-orange);
+  border-color: var(--kisan-accent-orange);
+  color: white;
+}
+
+.customer-search-btn:hover {
+  background-color: #e65100;
+  border-color: #e65100;
+  color: white;
+}
+/* Modern Card Enhancements & Hover Effects */
+.modern-product-card {
+  background-color: #ffffff;
+  box-shadow: 0 4px 15px rgba(27, 77, 62, 0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(46, 125, 50, 0.1) !important;
+}
+
+.modern-product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 25px rgba(27, 77, 62, 0.15);
+  border-color: rgba(46, 125, 50, 0.3) !important;
+}
+
+.product-img-zoom {
+  transition: transform 0.5s ease;
+}
+
+.modern-product-card:hover .product-img-zoom {
+  transform: scale(1.08);
+}
+
+.product-title-link:hover {
+  color: var(--kisan-leaf-green, #2e7d32) !important;
+}
+
+.farmer-link:hover {
+  color: var(--kisan-forest-green, #1b4d3e) !important;
+  text-decoration: underline !important;
+}
+
+.category-pill {
+  background-color: var(--kisan-light-green, #e8f5e9) !important;
+  font-weight: 600;
+}
+/* ==========================================
+   CUSTOMER PAGE & MOBILE DOCK LOCK FIX
+========================================== */
+.customer-page {
+  padding-bottom: 75px !important; /* Protects content from being hidden behind the fixed mobile dock */
+}
+
+.order-tabs-container {
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: 4px;
+}
+
+.order-tabs-container::-webkit-scrollbar {
+  display: none;
+}
+
+.order-card {
+  border: 1px solid rgba(0, 0, 0, 0.04) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.order-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 105, 52, 0.08) !important;
+}
+
+.uppercase-label {
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+@media (max-width: 991px) {
+  .customer-page {
+    margin-top: 60px !important;
+  }
+
+  .order-card .row > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .order-card .row > div:nth-child(even) {
+    text-align: right;
+  }
+}
