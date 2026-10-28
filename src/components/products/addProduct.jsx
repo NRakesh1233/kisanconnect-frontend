@@ -1,4 +1,4 @@
-import "./AddProduct.css";
+import "./addProduct.css";
 import { useState,useEffect } from "react";
 import axios from "axios";
 import { useFormik } from "formik";
