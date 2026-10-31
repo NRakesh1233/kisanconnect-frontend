@@ -5,7 +5,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../navbar/navbar.css';
 import '../navbar/common.css';
 
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function CustomerNavbar({ cartCount = 0 }) {
   const navigate = useNavigate();
@@ -73,7 +73,7 @@ export default function CustomerNavbar({ cartCount = 0 }) {
       <div className="features">
         <Link to="/customer/profile" className="d-flex align-items-center text-decoration-none" title="Go to Profile">
           <img
-            src={getProfileImageSrc(customer?.profilePic || customer?.image)}
+             src={getProfileImageSrc(customer?.profilePic || customer?.image)}
             alt="Profile"
             className="rounded-circle object-fit-cover border shadow-sm"
             style={{ width: '38px', height: '38px' }}

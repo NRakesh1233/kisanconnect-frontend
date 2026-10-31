@@ -5,7 +5,7 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
-
+const BASE_URL=import.meta.env.VITE_API_BASE_URL
 export function Login() {
   const navigate = useNavigate();
   const [statusState, setStatusState] = useState({ message: "", type: "" }); // "success" or "error"
@@ -25,7 +25,7 @@ export function Login() {
       setStatusState({ message: "", type: "" });
 
       // Keep using standard axios for login since user isn't authenticated yet
-      axios.post("http://localhost:8080/public/user/login", data)
+      axios.post(`${BASE_URL}/public/user/login`, data)
         .then((r) => {
           setStatusState({ message: r.data.message || "Login successful! Redirecting...", type: "success" });
           

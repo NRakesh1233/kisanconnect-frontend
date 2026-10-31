@@ -9,7 +9,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 gsap.registerPlugin(ScrollTrigger);
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export default function FarmerStorefront() {
   const { fid } = useParams();
   const { totalItemsCount } = useCart();
@@ -110,7 +110,7 @@ export default function FarmerStorefront() {
               <div className="col-md-3 text-center">
                 {profilePic ? (
                   <img
-                      src={`${BASE_URL}/uploads/profiles/${profilePic}`}
+                      src={profilePic}
                     alt={name}
                     className="rounded-circle object-fit-cover border border-3 border-success shadow"
                     style={{ width: '130px', height: '130px' }}

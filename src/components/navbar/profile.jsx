@@ -1,22 +1,24 @@
 import "./profile.css";
 import { FarmerEarnings } from "../FarmerErning/FarmerEarning";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { loadDashboard, loadReviews, loadUserProfile } from "../../service";
+import api from "../../services/api"; // Make sure your axios api instance is imported
 import { Navbar } from "./navbar";
 import moment from "moment";
 import { 
   FaUserCircle, FaStar, FaLeaf, FaShoppingBasket, FaRupeeSign, 
   FaClipboardList, FaBell, FaCog, FaEdit, FaMapMarkerAlt, FaPhone, 
   FaEnvelope, FaCalendarAlt, FaCheckCircle, FaTractor, FaSeedling, 
-  FaAward, FaEye, FaArrowUp, FaClock 
+  FaAward, FaEye, FaArrowUp, FaClock, FaCamera 
 } from "react-icons/fa";
 import { MdReviews } from "react-icons/md";
 import AnalyticsSection from "../Analytics/analytics";
 
 export default function FarmerProfile() {
   const navigate = useNavigate();
-  const BASE_URL = "http://localhost:8080";
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+  const fileInputRef = useRef(null);
 
   const [reviews, setReviews] = useState([]);
   const [stats, setStats] = useState({
@@ -27,6 +29,8 @@ export default function FarmerProfile() {
   });
 
   const [farmer, setFarmer] = useState({});
+  const [successMsg, setSuccessMsg] = useState('');
+  const [error, setError] = useState('');
 
   async function fetchDashboard() {
     try {
@@ -36,10 +40,11 @@ export default function FarmerProfile() {
       console.error("Failed to load dashboard data:", err);
     }
   }
+
   const getValidRating = (ratingVal) => {
-  const num = parseFloat(ratingVal);
-  return !isNaN(num) ? num.toFixed(1) : "4.9"; // Fallback to 4.9 if invalid
-};
+    const num = parseFloat(ratingVal);
+    return !isNaN(num) ? num.toFixed(1) : "4.9";
+  };
 
   async function fetchReviews() {
     try {
@@ -65,6 +70,40 @@ export default function FarmerProfile() {
     fetchReviews();
   }, []);
 
+  // Handle profile picture file selection and upload to backend
+  const handleProfilePicChange = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    try {
+      setError('');
+      const formData = new FormData();
+      // Match the parameter expected by your @ModelAttribute AddProfileRequest request in Spring Boot
+      formData.append('profilePic', file);
+
+      // Call your backend profile update endpoint
+      const response = await api.post('/farmer/profile/update', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      // Refresh profile data or update state with the response data
+      const updatedProfile = await loadUserProfile();
+      if (updatedProfile) {
+        setFarmer(updatedProfile);
+      } else {
+        // Fallback local preview update if loadUserProfile doesn't immediately return it
+        const previewUrl = URL.createObjectURL(file);
+        setFarmer(prev => ({ ...prev, profilePic: previewUrl }));
+      }
+
+      setSuccessMsg(response.data || 'Profile picture updated successfully!');
+      setTimeout(() => setSuccessMsg(''), 4000);
+    } catch (err) {
+      console.error('Failed to upload profile picture:', err);
+      setError('Failed to upload profile picture. Please try again.');
+    }
+  };
+
   const statistics = [
     {
       title: "Products",
@@ -84,15 +123,13 @@ export default function FarmerProfile() {
       icon: <FaRupeeSign />,
       color: "#d97706"
     },
-   {
-  title: "Rating",
-  value: getValidRating(stats?.rating),
-  icon: <FaStar />,
-  color: "#2563eb"
-}
+    {
+      title: "Rating",
+      value: getValidRating(stats?.rating),
+      icon: <FaStar />,
+      color: "#2563eb"
+    }
   ];
-  // Safe rating parser helper
-
 
   return (
     <div className="farmer-profile-wrapper">
@@ -110,22 +147,41 @@ export default function FarmerProfile() {
               </div>
 
               <div className="sidebar-profile">
-                <div className="profile-image-container">
-                  <div className="profile-image">
+                <div className="profile-image-container position-relative" style={{ display: 'inline-block', cursor: 'pointer' }} onClick={() => fileInputRef.current.click()} title="Click to change profile picture">
+                  <div className="profile-image overflow-hidden rounded-circle border border-2 border-success" style={{ width: '100px', height: '100px', margin: '0 auto' }}>
                     <img
-                      src={farmer.profilePic ? `${BASE_URL}/uploads/profiles/${farmer.profilePic}` : "https://via.placeholder.com/100?text=Farmer"}
+                      src={
+                        farmer.profilePic 
+                      
+                          ||"https://via.placeholder.com/100?text=Farmer"
+                      }
                       alt="Farmer"
+                      className="w-100 h-100 object-fit-cover"
                       onError={(e) => { e.target.src = "https://via.placeholder.com/100?text=Farmer"; }}
                     />
                   </div>
-                  <div className="verified-badge">
-                    <span className="material-symbols-outlined">verified</span>
-                  </div>
+                  {/* Camera Icon Overlay */}
+                  <span className="position-absolute bottom-0 end-0 bg-success text-white rounded-circle p-2 shadow-sm d-flex align-items-center justify-content-center" style={{ width: '30px', height: '30px', fontSize: '12px' }}>
+                    <FaCamera />
+                  </span>
+                </div>
+
+                {/* Hidden File Input for Profile Picture */}
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  className="d-none" 
+                  accept="image/*"
+                  onChange={handleProfilePicChange}
+                />
+
+                <div className="verified-badge mt-2">
+                  <span className="material-symbols-outlined">verified</span>
                 </div>
                 <h2>{farmer.name || "Farmer Profile"}</h2>
                 <div className="rating">
                   <span className="material-symbols-outlined filled">star</span>
-                  <span className="rating-number">{getValidRating(stats?.rating) }</span>
+                  <span className="rating-number">{getValidRating(stats?.rating)}</span>
                   <span className="review-count">({reviews?.length || 0} Reviews)</span>
                 </div>
               </div>
@@ -165,6 +221,18 @@ export default function FarmerProfile() {
           {/* ================= MAIN CONTENT ================= */}
           <div className="col-lg-9 col-md-12 main-content">
             
+            {successMsg && (
+              <div className="alert alert-success shadow-sm mb-3" role="alert">
+                <FaCheckCircle className="me-2" /> {successMsg}
+              </div>
+            )}
+
+            {error && (
+              <div className="alert alert-danger shadow-sm mb-3" role="alert">
+                {error}
+              </div>
+            )}
+
             {/* Welcome Banner */}
             <div className="welcome-card glass-card mb-4">
               <div>

@@ -7,7 +7,7 @@ import { productService } from '../../services/productService';
 import { useCart } from '../../context/CartContext';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Farmers() {
   const { totalItemsCount } = useCart();

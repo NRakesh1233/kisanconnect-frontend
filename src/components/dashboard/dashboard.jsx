@@ -14,7 +14,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const BASE_URL = "http://localhost:8080";
+  const BASE_URL = import.meta.env.BASE_URL;
 
   const [stats, setStats] = useState({
     products: [],
@@ -120,6 +120,8 @@ export default function Dashboard() {
           </div>
          <div className="dash-hero-img-box">
   <img
+
+
     src={farmer?.profilePic || "https://ui-avatars.com/api/?name=Farmer&background=e8f5e9&color=2e7d32&size=400"}
     alt="Farmer Profile"
     className="rounded-circle shadow-lg object-fit-cover border border-3 border-white"

@@ -12,6 +12,8 @@ import {
     FaPepperHot,
     FaShoppingBasket
 } from "react-icons/fa";
+
+const BASE_URL=import.meta.env.VITE_API_BASE_URL;
 export default function Products() {
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
@@ -34,7 +36,7 @@ if(localStorage.getItem("role")!=="FARMER"){
 
     useEffect(() => {
         axios
-            .get("http://localhost:8080/public/products")
+            .get(`${BASE_URL}/public/products`)
             .then((response) => {
                 setProducts(response.data);
                 setFilteredProducts(response.data);
@@ -215,7 +217,7 @@ filteredProducts.map()
                                         <div className="product-card" key={product.productId}>
                                             <div className="image-box">
                                                 <img
-                                                    src={`http://localhost:8080/uploads/products/${product.image}`}
+                                                   
                                                     alt=""
                                                 />
                                                 <div className="discount-badge">
@@ -232,7 +234,7 @@ filteredProducts.map()
                                                 <div className="farmer-details">
                                                     <img
                                                         className="farmer-pic"
-                                                        src={`http://localhost:8080/uploads/profile/${product.profilePic}`}
+                                                        src={product.profilePic}
                                                         alt=""
                                                     />
                                                     <div>
@@ -310,7 +312,7 @@ TRENDING PRODUCTS
                             filteredProducts.slice(0, 4).map((product) => (
                                 <div className="trending-card" key={product.productId}>
                                     <img
-                                        src={`http://localhost:8080/uploads/products/${product.image}`}
+                                       
                                         alt=""
                                     />
                                     <div>
@@ -334,7 +336,7 @@ RECOMMENDED PRODUCTS
                             filteredProducts.slice(0, 3).map((product) => (
                                 <div className="recommended-card" key={product.productId}>
                                     <img
-                                        src={`http://localhost:8080/uploads/products/${product.image}`}
+                                       
                                         alt=""
                                     />
                                     <div>
@@ -375,7 +377,7 @@ TOP FARMERS
                                 .map((farmer) => (
                                     <div className="farmer-card" key={farmer.farmerId}>
                                         <img
-                                            src={`http://localhost:8080/uploads/profile/${farmer.profilePic}`}
+                                            src={farmer.profilePic}
                                             alt=""
                                         />
                                         <h3>

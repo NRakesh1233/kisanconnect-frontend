@@ -5,7 +5,7 @@ import { loadFarmerEarnings } from "../../service";
 import { FaUserCircle } from "react-icons/fa";
 import moment from "moment";
 
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 
 
@@ -141,7 +141,7 @@ console.log("Current earnings:", farmerEarnings);
 {
             product.productImage ? (
             <img
-               src={`${BASE_URL}/uploads/products/${product.productImage}`}
+               src={product.productImage}
 
               alt={product.productName}
               className="fe-product-image"
@@ -298,7 +298,7 @@ console.log("Current earnings:", farmerEarnings);
                   <div className="fe-review-person">
                     {
 review.customerDetails.profilePic ? (<img
-  src={`${BASE_URL}/uploads/profiles/${review.customerDetails.profilePic}`}
+  src={review.customerDetails.profilePic}
   alt="Profile"
   className="rounded-circle object-fit-cover border border-success"
   width="42"

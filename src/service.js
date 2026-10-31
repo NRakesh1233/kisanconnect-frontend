@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8080";
+const BASE_URL =import.meta.env.VITE_API_BASE_URL;
 
 export const loadDashboard = async () => {
     try {
@@ -15,7 +15,7 @@ export const loadDashboard = async () => {
 
         const farmer = {
             name: res.data.farmerName,
-            profilePic: `${BASE_URL}/uploads/profiles/${res.data.profilePic}`,
+            profilePic: res.data.profilePic,
             quote: "Fresh food starts with passionate farmers."
         };
 

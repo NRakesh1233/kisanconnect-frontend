@@ -10,7 +10,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 gsap.registerPlugin(ScrollTrigger);
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export default function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -208,7 +208,7 @@ export default function ProductDetails() {
             <div className="card border-0 shadow-sm rounded-4 overflow-hidden bg-white p-2">
               <div className="position-relative overflow-hidden rounded-3" style={{ height: '400px' }}>
                 <img
-                               src={`${BASE_URL}/uploads/products/${image}`}
+                               src={image}
 
                   alt={productName}
                   className="w-100 h-100 object-fit-cover"
@@ -311,7 +311,7 @@ export default function ProductDetails() {
                 <div className="d-flex align-items-center gap-3">
                   {profilePic ? (
                     <img
-                                src={`${BASE_URL}/uploads/profiles/${profilePic}`}
+                                src={profilePic}
                       alt={farmerName}
                       className="rounded-circle object-fit-cover border border-success shadow-sm"
                       style={{ width: '45px', height: '45px' }}

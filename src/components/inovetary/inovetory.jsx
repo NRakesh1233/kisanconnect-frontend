@@ -19,7 +19,7 @@ import {
 
 export default function FarmerProducts() {
     const navigate = useNavigate();
-    const BASE_URL = "http://localhost:8080";
+    const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
@@ -263,7 +263,7 @@ export default function FarmerProducts() {
                             <div className="product-card glass-card shadow-sm rounded-4 overflow-hidden bg-white mb-4" key={item.productId}>
                                 <div className="product-image position-relative">
                                     <img
-                                        src={`${BASE_URL}/uploads/products/${item.productImage}`}
+                                        src={item.productImage}
                                         alt={item.productName}
                                         className="w-100 object-fit-cover"
                                         style={{ height: "190px" }}

@@ -4,7 +4,7 @@ import axios from "axios";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useParams } from "react-router-dom";
-const BASE_URL = "http://localhost:8080";
+const BASE_URL =import.meta.env.VITE_API_BASE_URL;
 export default function UpdateProduct() {
     const [previewImage, setPreviewImage] = useState(null);
     const[product,setProduct]=useState({});
@@ -31,7 +31,7 @@ axios.get(`${BASE_URL}/public/products/${params.pid}`,{
 }).then((res)=>{
     setProduct(res.data);
     console.log(res.data);
-    setPreviewImage(`${BASE_URL}/uploads/products/${res.data.productImage}`);
+    setPreviewImage(res.data.productImage);
 })
 },[params.pid,product])
 

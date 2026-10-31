@@ -8,7 +8,7 @@ import { farmerService } from '../../services/farmerService';
 import { useCart } from '../../context/CartContext';
 
 
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function CustomerHome() {
   const { totalItemsCount } = useCart();

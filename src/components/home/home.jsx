@@ -10,7 +10,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 export function Home() {
-  const BASE_URL = "http://localhost:8080";
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const [getTop4, setTop4] = useState([]);
 
   const heroRef = useRef(null);
@@ -21,7 +21,7 @@ export function Home() {
   const supportRef = useRef(null);
 
   function getProducts4() {
-    axios.get("http://localhost:8080/public/products/top4")
+    axios.get(`${BASE_URL}/public/products/top4`)
       .then((p) => setTop4(p.data))
       .catch((err) => console.error("Error fetching top 4 products:", err));
   }
@@ -208,7 +208,7 @@ export function Home() {
               <div className="kc-product-card shadow-sm" key={item.productId}>
                 <div className="kc-img-wrapper">
                   <img
-                    src={`${BASE_URL}/uploads/products/${item.productImage}`}
+                    src={item.productImage}
                     alt={item.productName}
                   />
                   <span className={`kc-stock-badge ${item.stock === 0 ? "out" : item.stock < 10 ? "low" : "in"}`}>

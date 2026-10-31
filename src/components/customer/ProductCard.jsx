@@ -7,7 +7,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 // Register GSAP ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
-const BASE_URL = "http://localhost:8080";
+const BASE_URL =import.meta.env.VITE_API_BASE_URL;
 export default function ProductCard({ product }) {
   const { addToCart } = useCart();
   const [alertMsg, setAlertMsg] = useState('');
@@ -113,7 +113,7 @@ export default function ProductCard({ product }) {
       <div className="product-img-wrapper position-relative bg-light text-center overflow-hidden" style={{ height: '210px' }}>
         <Link to={`/customer/products/${productId}`}>
           <img
-              src={`${BASE_URL}/uploads/products/${product.image}`}
+             src={product.image}
             alt={productName}
             className="w-100 h-100 object-fit-cover product-img-zoom"
             onError={(e) => {
@@ -178,7 +178,7 @@ export default function ProductCard({ product }) {
         <div className="d-flex align-items-center gap-2 mt-1 mb-3 pt-2 border-top border-light">
           {profilePic ? (
             <img
-               src={`${BASE_URL}/uploads/profiles/${profilePic}`}
+               src={{profilePic}}
               alt={farmerName}
               className="rounded-circle object-fit-cover border border-success"
               style={{ width: '32px', height: '32px' }}
@@ -207,7 +207,7 @@ export default function ProductCard({ product }) {
         <div className="mt-auto pt-2 border-top d-flex align-items-center justify-content-between">
           <div>
             <span className="fs-5 fw-bold text-success">₹{price}</span>
-            <span className="text-muted fs-8"> / {unit}</span>
+            <span className="text-muted fs-8"> / {unit||"units"}</span>
           </div>
 
           <button

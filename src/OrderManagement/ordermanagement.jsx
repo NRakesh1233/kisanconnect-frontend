@@ -4,7 +4,7 @@ import { Navbar } from "../components/navbar/navbar";
 import axios from "axios";
 import "./Orders.css";
 
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 export default function Orders() {
   const navigate = useNavigate();

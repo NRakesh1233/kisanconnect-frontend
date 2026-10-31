@@ -7,7 +7,7 @@ import * as yup from 'yup';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import confetti from 'canvas-confetti';
-
+const BASE_URL=import.meta.env.VITE_API_BASE_URL;
 export function Register(){
     let navigate = useNavigate();
     const pic = useRef(null);
@@ -55,7 +55,7 @@ export function Register(){
             const { confirmPassword, terms, ...payload } = data;
             console.log(payload);
 
-            axios.post("http://localhost:8080/public/user/register", payload)
+            axios.post(`${BASE_URL}/public/user/register`, payload)
             .then((res)=>{
                setIsSuccess(true);
                confetti({

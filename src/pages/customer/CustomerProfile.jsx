@@ -6,8 +6,8 @@ import { customerService } from '../../services/customerService';
 import { useCart } from '../../context/CartContext';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import moment from 'moment';
-
-const BASE_URL = "http://localhost:8080";
+import api from '../../services/api';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 export default function CustomerProfile() {
   const { totalItemsCount } = useCart();
@@ -78,22 +78,30 @@ export default function CustomerProfile() {
 
   // Handle profile picture file selection
   const handleProfilePicChange = async (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files && e.target.files[0];
     if (!file) return;
 
     try {
-      setError(null);
-      const previewUrl = URL.createObjectURL(file);
-      setProfile(prev => ({ ...prev, profilePic: previewUrl }));
-      
-      setSuccessMsg('Profile picture updated successfully!');
+      setError('');
+      const formData = new FormData();
+      // Match the parameter expected by your @ModelAttribute AddProfileRequest request in Spring Boot
+      formData.append('profilePic', file);
+
+      // Call your backend profile update endpoint
+      const response = await api.post('/customer/profile/update', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      // Refresh profile data or update state with the response data
+     
+
+      setSuccessMsg(response.data || 'Profile picture updated successfully!');
       setTimeout(() => setSuccessMsg(''), 4000);
     } catch (err) {
       console.error('Failed to upload profile picture:', err);
-      setError('Failed to update profile picture.');
+      setError('Failed to upload profile picture. Please try again.');
     }
   };
-
   const handleSaveProfile = async (e) => {
     e.preventDefault();
     try {
@@ -195,7 +203,7 @@ export default function CustomerProfile() {
               <div className="position-relative" style={{ cursor: 'pointer' }} title="Click to change profile picture" onClick={() => document.getElementById('profilePicInput').click()}>
                 {profile.profilePic ? (
                   <img 
-                    src={profile.profilePic.startsWith('blob:') ? profile.profilePic : `${BASE_URL}/uploads/profiles/${profile.profilePic}`} 
+                    src={profile.profilePic} 
                     alt="Profile" 
                     className="rounded-circle border"
                     style={{ width: '50px', height: '50px', objectFit: 'cover' }}
@@ -463,7 +471,7 @@ export default function CustomerProfile() {
                         <div key={revId || index} className="border rounded-3 p-3 bg-light">
                           <div className="d-flex gap-3 align-items-start">
                             <img 
-                              src={productImage.startsWith('blob:') ? productImage : `${BASE_URL}/uploads/products/${productImage}`}
+                              src={productImage}
                               alt={productName}
                               className="rounded border bg-white"
                               style={{ width: '60px', height: '60px', objectFit: 'cover' }}

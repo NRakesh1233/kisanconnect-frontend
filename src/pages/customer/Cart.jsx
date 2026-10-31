@@ -7,7 +7,7 @@ import { useCart } from '../../context/CartContext';
 import { productService } from '../../services/productService';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Cart() {
   const { cartItems, updateQuantity, removeFromCart, clearCart, totalItemsCount, cartSubtotal } = useCart();
@@ -71,14 +71,7 @@ export default function Cart() {
   // Helper to safely format image source
   const getProductImageSrc = (item) => {
     const imgProp = item.imageUrl || item.image;
-    if (!imgProp) return 'https://via.placeholder.com/80?text=Produce';
-    if (imgProp.startsWith('http://') || imgProp.startsWith('https://')) {
-      return imgProp;
-    }
-    if (imgProp.includes('/uploads/')) {
-      return `${BASE_URL}${imgProp}`;
-    }
-    return `${BASE_URL}/uploads/products/${imgProp}`;
+    return imgProp;
   };
 console.log('Farmer products:', farmerProducts);
 console.log('farmer ids:', uniqueFarmerIds);
@@ -107,7 +100,7 @@ console.log('farmer ids:', uniqueFarmerIds);
               <i className="bi bi-cart-x text-muted display-3 d-block mb-3"></i>
               <h4 className="fw-bold text-dark">Your cart is empty</h4>
               <p className="text-muted mb-4">Explore our fresh agricultural catalog and add some farm-fresh produce!</p>
-              <Link to="/customer/products" className="btn btn-kisan-primary px-4 py-2">
+              <Link to="/customer/products" className="btn btn-success px-4 py-2">
                 Browse Products
               </Link>
             </div>
