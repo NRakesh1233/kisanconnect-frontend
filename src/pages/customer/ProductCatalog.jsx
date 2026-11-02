@@ -27,8 +27,9 @@ export default function ProductCatalog() {
         setError(null);
 
         const [productsData, categoriesData] = await Promise.allSettled([
-          productService.getAllProducts(),['vegetables', 'fruits', 'grains', 'organic produce']
-         // productService.getCategories()
+          productService.getAllProducts(),
+          ['vegetables', 'fruits', 'grains', 'organic produce']
+          // productService.getCategories()
         ]);
 
         if (productsData.status === 'fulfilled') {
@@ -83,10 +84,11 @@ export default function ProductCatalog() {
   };
 
   return (
-    <div className="min-vh-100 d-flex flex-column bg-light" >
+    <div className="min-vh-100 d-flex flex-column bg-light">
       <CustomerNavbar cartCount={totalItemsCount} />
 
-      <main className="container py-4 flex-grow-1" style={{marginTop:"100px"}} >
+      {/* Added responsive top margin and generous bottom padding (pb-5) to prevent cutoff */}
+      <main className="container py-4 mb-5 flex-grow-1" style={{ marginTop: '80px' }}>
         {/* Banner Section */}
         <div className="p-4 mb-4 rounded-3 text-white shadow-sm" style={{ backgroundColor: 'var(--kisan-forest-green, #1b4d3e)' }}>
           <div className="row align-items-center">

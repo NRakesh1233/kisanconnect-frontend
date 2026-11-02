@@ -7,7 +7,7 @@ import { useCart } from '../../context/CartContext';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import moment from 'moment';
 import api from '../../services/api';
-const BASE_URL = import.meta.env.VITE_API_BASE_URL
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function CustomerProfile() {
   const { totalItemsCount } = useCart();
@@ -84,16 +84,11 @@ export default function CustomerProfile() {
     try {
       setError('');
       const formData = new FormData();
-      // Match the parameter expected by your @ModelAttribute AddProfileRequest request in Spring Boot
       formData.append('profilePic', file);
 
-      // Call your backend profile update endpoint
       const response = await api.post('/customer/profile/update', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-
-      // Refresh profile data or update state with the response data
-     
 
       setSuccessMsg(response.data || 'Profile picture updated successfully!');
       setTimeout(() => setSuccessMsg(''), 4000);
@@ -102,6 +97,7 @@ export default function CustomerProfile() {
       setError('Failed to upload profile picture. Please try again.');
     }
   };
+
   const handleSaveProfile = async (e) => {
     e.preventDefault();
     try {
@@ -236,7 +232,22 @@ export default function CustomerProfile() {
             {/* Desktop Sidebar & Mobile Horizontal Scrollable Nav */}
             <div className="profile-nav-container">
               <div className="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
-                <div className="list-group list-group-flush flex-row flex-lg-column">
+                {/* Added inline styles for mobile horizontal scrolling wrapper */}
+                <div 
+                  className="list-group list-group-flush flex-row flex-lg-column"
+                  style={{
+                    overflowX: 'auto',
+                    WebkitOverflowScrolling: 'touch',
+                    whiteSpace: 'nowrap',
+                    scrollbarWidth: 'none' /* Firefox */
+                  }}
+                >
+                  <style>{`
+                    /* Hide scrollbar for Chrome, Safari and Opera */
+                    .profile-nav-container .list-group::-webkit-scrollbar {
+                      display: none;
+                    }
+                  `}</style>
                   
                   <div 
                     onClick={() => navigate('/customer/orders')}
