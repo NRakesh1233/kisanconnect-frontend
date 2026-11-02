@@ -19,6 +19,7 @@ export default function FarmerProfile() {
   const navigate = useNavigate();
   const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
   const fileInputRef = useRef(null);
+  const mobileFileInputRef = useRef(null);
 
   const [reviews, setReviews] = useState([]);
   const [stats, setStats] = useState({
@@ -78,20 +79,16 @@ export default function FarmerProfile() {
     try {
       setError('');
       const formData = new FormData();
-      // Match the parameter expected by your @ModelAttribute AddProfileRequest request in Spring Boot
       formData.append('profilePic', file);
 
-      // Call your backend profile update endpoint
       const response = await api.post('/farmer/profile/update', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      // Refresh profile data or update state with the response data
       const updatedProfile = await loadUserProfile();
       if (updatedProfile) {
         setFarmer(updatedProfile);
       } else {
-        // Fallback local preview update if loadUserProfile doesn't immediately return it
         const previewUrl = URL.createObjectURL(file);
         setFarmer(prev => ({ ...prev, profilePic: previewUrl }));
       }
@@ -138,7 +135,7 @@ export default function FarmerProfile() {
       <div className="container-fluid farmer-page">
         <div className="row g-4">
           
-          {/* ================= SIDEBAR ================= */}
+          {/* ================= SIDEBAR (Desktop) ================= */}
           <div className="col-lg-3 d-none d-lg-block">
             <div className="sidebar shadow-sm">
               <div className="sidebar-logo">
@@ -150,23 +147,17 @@ export default function FarmerProfile() {
                 <div className="profile-image-container position-relative" style={{ display: 'inline-block', cursor: 'pointer' }} onClick={() => fileInputRef.current.click()} title="Click to change profile picture">
                   <div className="profile-image overflow-hidden rounded-circle border border-2 border-success" style={{ width: '100px', height: '100px', margin: '0 auto' }}>
                     <img
-                      src={
-                        farmer.profilePic 
-                      
-                          ||"https://via.placeholder.com/100?text=Farmer"
-                      }
+                      src={farmer.profilePic || "https://via.placeholder.com/100?text=Farmer"}
                       alt="Farmer"
                       className="w-100 h-100 object-fit-cover"
                       onError={(e) => { e.target.src = "https://via.placeholder.com/100?text=Farmer"; }}
                     />
                   </div>
-                  {/* Camera Icon Overlay */}
                   <span className="position-absolute bottom-0 end-0 bg-success text-white rounded-circle p-2 shadow-sm d-flex align-items-center justify-content-center" style={{ width: '30px', height: '30px', fontSize: '12px' }}>
                     <FaCamera />
                   </span>
                 </div>
 
-                {/* Hidden File Input for Profile Picture */}
                 <input 
                   type="file" 
                   ref={fileInputRef} 
@@ -220,6 +211,63 @@ export default function FarmerProfile() {
 
           {/* ================= MAIN CONTENT ================= */}
           <div className="col-lg-9 col-md-12 main-content">
+
+            {/* ================= MOBILE PROFILE & HORIZONTAL NAV (Visible only on Mobile/Tablet) ================= */}
+            <div className="d-lg-none glass-card mb-4 p-3 text-center mobile-profile-box">
+              <div className="profile-image-container position-relative d-inline-block cursor-pointer" onClick={() => mobileFileInputRef.current.click()} title="Click to change profile picture">
+                <div className="profile-image overflow-hidden rounded-circle border border-2 border-success mx-auto" style={{ width: '90px', height: '90px' }}>
+                  <img
+                    src={farmer.profilePic || "https://via.placeholder.com/100?text=Farmer"}
+                    alt="Farmer"
+                    className="w-100 h-100 object-fit-cover"
+                    onError={(e) => { e.target.src = "https://via.placeholder.com/100?text=Farmer"; }}
+                  />
+                </div>
+                <span className="position-absolute bottom-0 end-0 bg-success text-white rounded-circle p-2 shadow-sm d-flex align-items-center justify-content-center" style={{ width: '28px', height: '28px', fontSize: '11px' }}>
+                  <FaCamera />
+                </span>
+              </div>
+
+              <input 
+                type="file" 
+                ref={mobileFileInputRef} 
+                className="d-none" 
+                accept="image/*"
+                onChange={handleProfilePicChange}
+              />
+
+              <h4 className="mt-2 mb-1 fw-bold text-dark">{farmer.name || "Farmer Profile"}</h4>
+              <div className="rating justify-content-center mb-3">
+                <span className="material-symbols-outlined filled text-success">star</span>
+                <span className="rating-number">{getValidRating(stats?.rating)}</span>
+                <span className="review-count">({reviews?.length || 0} Reviews)</span>
+              </div>
+
+              {/* Horizontal Scrollable Menu for Mobile */}
+              <div className="mobile-horizontal-nav">
+                <Link to="/dashboard" className="mobile-nav-pill">
+                  <span className="material-symbols-outlined">dashboard</span> Dashboard
+                </Link>
+                <Link to="/dashboard/products" className="mobile-nav-pill">
+                  <span className="material-symbols-outlined">inventory_2</span> Products
+                </Link>
+                <Link to="/dashboard/orders" className="mobile-nav-pill">
+                  <span className="material-symbols-outlined">shopping_bag</span> Orders
+                </Link>
+                <a href="#analytics-section" className="mobile-nav-pill">
+                  <span className="material-symbols-outlined">monitoring</span> Analytics
+                </a>
+                <a href="#reviews-section" className="mobile-nav-pill">
+                  <span className="material-symbols-outlined">reviews</span> Reviews
+                </a>
+                <a href="#earnings-section" className="mobile-nav-pill">
+                  <span className="material-symbols-outlined">payments</span> Earnings
+                </a>
+                <a href="#" className="mobile-nav-pill text-danger logout-pill" onClick={() => { localStorage.clear(); navigate("/login"); }}>
+                  <span className="material-symbols-outlined">logout</span> Logout
+                </a>
+              </div>
+            </div>
             
             {successMsg && (
               <div className="alert alert-success shadow-sm mb-3" role="alert">

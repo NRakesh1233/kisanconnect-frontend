@@ -38,7 +38,7 @@ body {
 
 .farmer-page {
     padding: 30px;
-    margin-top: 70px; /* Perfectly clears the fixed top navbar */
+    margin-top: 70px;
     max-width: 1400px;
 }
 
@@ -58,7 +58,7 @@ body {
 }
 
 /* =========================================
-   SIDEBAR
+   SIDEBAR (Desktop)
 ========================================= */
 .sidebar {
     position: sticky;
@@ -239,6 +239,64 @@ body {
 
 .logout:hover {
     background: #ffebee !important;
+}
+
+/* =========================================
+   MOBILE HORIZONTAL SCROLL NAV & PROFILE
+========================================= */
+.mobile-profile-box {
+    background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(238,247,237,0.9));
+}
+
+.mobile-horizontal-nav {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 8px 4px;
+    white-space: nowrap;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+}
+
+.mobile-horizontal-nav::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+.mobile-nav-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: #ffffff;
+    color: var(--primary-dark);
+    border: 1px solid #d1e7dd;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    transition: var(--transition);
+}
+
+.mobile-nav-pill:hover, .mobile-nav-pill:active {
+    background: var(--primary);
+    color: #ffffff;
+    border-color: var(--primary);
+}
+
+.mobile-nav-pill span {
+    font-size: 16px;
+}
+
+.mobile-nav-pill.logout-pill {
+    background: #fff5f5;
+    color: #dc2626;
+    border-color: #fecaca;
+}
+
+.mobile-nav-pill.logout-pill:hover {
+    background: #dc2626;
+    color: #ffffff;
 }
 
 /* =========================================
