@@ -15,14 +15,16 @@ export default function CustomerHome() {
   const [farmers, setFarmers] = useState([]);
   const [loading, setLoading] = useState(true);
 
+
+  
   useEffect(() => {
     const fetchHomeData = async () => {
       try {
         setLoading(true);
         // Fetch products and farmers concurrently
         const [prodRes, farmerRes] = await Promise.allSettled([
-          api.get('/customer/products'),
-          api.get('/customer/farmers')
+          api.get('/public/products/top4'),
+          api.get('/public/user/farmers/all')
         ]);
 
         if (prodRes.status === 'fulfilled') {
