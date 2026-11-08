@@ -141,34 +141,36 @@ export default function CustomerHome() {
         </div>
 
         {/* Featured Products Section */}
-        <section className="mb-5">
-          <div className="d-flex justify-content-between align-items-center mb-4">
-            <div>
-              <h3 className="fw-extrabold text-dark m-0">Featured Fresh Products</h3>
-              <p className="text-muted small m-0">Handpicked items directly from verified organic farmers</p>
-            </div>
-            <Link to="/customer/products" className="text-success fw-bold text-decoration-none hover-link">
-              View All <i className="bi bi-arrow-right"></i>
-            </Link>
-          </div>
+    <section className="mb-5">
+  <div className="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 className="fw-extrabold text-dark m-0">Featured Fresh Products</h3>
+      <p className="text-muted small m-0">Handpicked items directly from verified organic farmers</p>
+    </div>
+    <Link to="/customer/products" className="text-success fw-bold text-decoration-none hover-link">
+      View All <i className="bi bi-arrow-right"></i>
+    </Link>
+  </div>
 
-          <div className="row g-4">
-            {loading ? (
-              <div className="text-center py-5">
-                <div className="spinner-border text-success" role="status"></div>
-              </div>
-            ) : featuredProducts.length === 0 ? (
-              <div className="text-center py-5 text-muted glass-card rounded-4 p-4">
-                <p className="mb-0">No featured products available at the moment.</p>
-              </div>
-            ) : (
-              featuredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-       
-              ))
-            )}
-          </div>
-        </section>
+  <div className="row g-4">
+    {loading ? (
+      <div className="text-center py-5">
+        <div className="spinner-border text-success" role="status"></div>
+      </div>
+    ) : featuredProducts.length === 0 ? (
+      <div className="text-center py-5 text-muted glass-card rounded-4 p-4">
+        <p className="mb-0">No featured products available at the moment.</p>
+      </div>
+    ) : (
+      featuredProducts.map((product) => (
+        /* Added col-6 for mobile 2-column layout and col-lg-3 for desktop 4-column layout */
+        <div key={product.id} className="col-6 col-md-4 col-lg-3 mb-4">
+          <ProductCard product={product} />
+        </div>
+      ))
+    )}
+  </div>
+</section>
 
         {/* Meet Our Farmers Section */}
         <section className="mb-5">
