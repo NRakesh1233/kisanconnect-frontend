@@ -141,7 +141,8 @@ export default function CustomerHome() {
         </div>
 
         {/* Featured Products Section */}
-    <section className="mb-5">
+  {/* --- Featured Fresh Products Section --- */}
+<section className="mb-5">
   <div className="d-flex justify-content-between align-items-center mb-4">
     <div>
       <h3 className="fw-extrabold text-dark m-0">Featured Fresh Products</h3>
@@ -152,19 +153,18 @@ export default function CustomerHome() {
     </Link>
   </div>
 
-  <div className="row g-4">
+  <div className="custom-responsive-grid">
     {loading ? (
-      <div className="text-center py-5">
+      <div className="text-center py-5 w-100">
         <div className="spinner-border text-success" role="status"></div>
       </div>
     ) : featuredProducts.length === 0 ? (
-      <div className="text-center py-5 text-muted glass-card rounded-4 p-4">
+      <div className="text-center py-5 text-muted glass-card rounded-4 p-4 w-100">
         <p className="mb-0">No featured products available at the moment.</p>
       </div>
     ) : (
       featuredProducts.map((product) => (
-        /* Added col-6 for mobile 2-column layout and col-lg-3 for desktop 4-column layout */
-        <div key={product.id} className="col-6 col-md-4 col-lg-3 mb-4">
+        <div key={product.id} className="grid-item-wrapper mb-4">
           <ProductCard product={product} />
         </div>
       ))
@@ -172,47 +172,47 @@ export default function CustomerHome() {
   </div>
 </section>
 
-        {/* Meet Our Farmers Section */}
-        <section className="mb-5">
-          <div className="d-flex justify-content-between align-items-center mb-4">
-            <div>
-              <h3 className="fw-extrabold text-dark m-0">Meet Our Local Farmers</h3>
-              <p className="text-muted small m-0">The hardworking hands behind your healthy food</p>
+{/* --- Meet Our Local Farmers Section --- */}
+<section className="mb-5">
+  <div className="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 className="fw-extrabold text-dark m-0">Meet Our Local Farmers</h3>
+      <p className="text-muted small m-0">The hardworking hands behind your healthy food</p>
+    </div>
+    <Link to="/customer/farmers" className="text-success fw-bold text-decoration-none hover-link">
+      View All <i className="bi bi-arrow-right"></i>
+    </Link>
+  </div>
+
+  <div className="custom-responsive-grid">
+    {farmers.length === 0 ? (
+      <div className="text-center py-4 text-muted glass-card rounded-4 p-4 w-100">
+        <p className="mb-0">Farmers profiles loading...</p>
+      </div>
+    ) : (
+      farmers.map((farmer, idx) => (
+        <div className="grid-item-wrapper mb-4" key={farmer.id || idx}>
+          <div className="glass-farmer-card rounded-4 p-4 text-center shadow-sm h-100">
+            <img 
+              src={farmer.profilePic ? farmer.profilePic : 'https://via.placeholder.com/90?text=Farmer'} 
+              alt={farmer.name} 
+              className="rounded-circle border border-3 border-success shadow-sm mb-3 object-fit-cover"
+              style={{ width: '90px', height: '90px' }}
+            />
+            <h5 className="fw-bold text-dark mb-1">{farmer.name || 'Local Farmer'}</h5>
+            <p className="text-muted small mb-2"><i className="bi bi-geo-alt-fill text-success me-1"></i>{farmer.location || 'Kurnool District'}</p>
+            <div className="badge bg-success bg-opacity-10 text-success px-3 py-1 rounded-pill mb-3">
+              <i className="bi bi-patch-check-fill me-1"></i> Verified Producer
             </div>
-            <Link to="/customer/farmers" className="text-success fw-bold text-decoration-none hover-link">
-              View All <i className="bi bi-arrow-right"></i>
+            <Link to="/customer/farmers" className="btn btn-outline-success btn-sm w-100 rounded-pill fw-bold">
+              View Farm Profile
             </Link>
           </div>
-
-          <div className="row g-4">
-            {farmers.length === 0 ? (
-              <div className="text-center py-4 text-muted glass-card rounded-4 p-4 col-12">
-                <p className="mb-0">Farmers profiles loading...</p>
-              </div>
-            ) : (
-              farmers.map((farmer, idx) => (
-                <div className="col-md-4" key={farmer.id || idx}>
-                  <div className="glass-farmer-card rounded-4 p-4 text-center shadow-sm h-100">
-                    <img 
-                      src={farmer.profilePic ?farmer.profilePic : 'https://via.placeholder.com/90?text=Farmer'} 
-                      alt={farmer.name} 
-                      className="rounded-circle border border-3 border-success shadow-sm mb-3 object-fit-cover"
-                      style={{ width: '90px', height: '90px' }}
-                    />
-                    <h5 className="fw-bold text-dark mb-1">{farmer.name || 'Local Farmer'}</h5>
-                    <p className="text-muted small mb-2"><i className="bi bi-geo-alt-fill text-success me-1"></i>{farmer.location || 'Kurnool District'}</p>
-                    <div className="badge bg-success bg-opacity-10 text-success px-3 py-1 rounded-pill mb-3">
-                      <i className="bi bi-patch-check-fill me-1"></i> Verified Producer
-                    </div>
-                    <Link to="/customer/farmers" className="btn btn-outline-success btn-sm w-100 rounded-pill fw-bold">
-                      View Farm Profile
-                    </Link>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </section>
+        </div>
+      ))
+    )}
+  </div>
+</section>
 
         {/* Promotional Dribbble Style Banner */}
         <section className="promo-banner-card rounded-4 p-5 text-white position-relative overflow-hidden shadow-lg mb-4">
