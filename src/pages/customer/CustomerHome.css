@@ -194,23 +194,53 @@
 }
 
 /* Default desktop sizing: 4 items per row */
+
+/* Responsive Product & Farmer Grid */
+
+.custom-responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+/* Remove fixed widths from individual cards */
 .custom-responsive-grid .grid-item-wrapper {
-  width: calc(25% - 12px);
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 0 !important;
 }
 
-/* Tablet sizing: 3 items per row */
-@media (max-width: 991px) {
-  .custom-responsive-grid .grid-item-wrapper {
-    width: calc(33.333% - 11px);
-  }
-}
-
-/* Mobile sizing: Exactly 2 items side-by-side per row */
-@media (max-width: 768px) {
+/* Large laptops and desktops */
+@media (min-width: 1400px) {
   .custom-responsive-grid {
-    gap: 10px;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
+}
+
+/* Normal laptops */
+@media (min-width: 992px) and (max-width: 1399px) {
+  .custom-responsive-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Tablets */
+@media (min-width: 576px) and (max-width: 991px) {
+  .custom-responsive-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px;
+  }
+}
+
+/* Mobile phones: Exactly ONE card per row */
+@media (max-width: 575px) {
+  .custom-responsive-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
   .custom-responsive-grid .grid-item-wrapper {
-    width: calc(50% - 5px) !important;
+    width: 100% !important;
   }
 }
