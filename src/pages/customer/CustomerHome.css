@@ -186,61 +186,38 @@
   opacity: 0.8;
   transform: translateX(4px);
 }
-/* Container grid wrapper */
-.custom-responsive-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-}
+
 
 /* Default desktop sizing: 4 items per row */
 
 /* Responsive Product & Farmer Grid */
 
+/* Flexible Product & Farmer Layout */
+
 .custom-responsive-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 25px 20px;
   width: 100%;
 }
 
-/* Remove fixed widths from individual cards */
+/* Keep original card width */
 .custom-responsive-grid .grid-item-wrapper {
-  width: 100%;
-  min-width: 0;
+  flex: 0 0 auto;
+  width: auto;
   margin-bottom: 0 !important;
 }
 
-/* Large laptops and desktops */
-@media (min-width: 1400px) {
-  .custom-responsive-grid {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-  }
-}
-
-/* Normal laptops */
-@media (min-width: 992px) and (max-width: 1399px) {
-  .custom-responsive-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
-/* Tablets */
-@media (min-width: 576px) and (max-width: 991px) {
-  .custom-responsive-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 15px;
-  }
-}
-
-/* Mobile phones: Exactly ONE card per row */
+/* Mobile: One card per row */
 @media (max-width: 575px) {
   .custom-responsive-grid {
-    grid-template-columns: 1fr;
+    flex-direction: column;
     gap: 15px;
   }
 
   .custom-responsive-grid .grid-item-wrapper {
-    width: 100% !important;
+    width: 100%;
   }
 }
