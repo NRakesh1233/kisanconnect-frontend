@@ -7,7 +7,7 @@ import { useCart } from '../../context/CartContext';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import moment from 'moment';
 import api from '../../services/api';
-import './CustomerProfile.css';
+import './customerProfile.css';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
