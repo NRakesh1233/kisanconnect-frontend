@@ -43,16 +43,7 @@ export default function CustomerHome() {
     fetchHomeData();
   }, []);
 
-  const handleAddToCart = async (productId) => {
-    try {
-      await api.post(`/customer/cart/add?productId=${productId}&quantity=1`);
-      alert('Product added to cart successfully! 🛒');
-    } catch (err) {
-      console.error('Failed to add to cart:', err);
-      alert('Please log in or register to purchase products.');
-      navigate('/login');
-    }
-  };
+
 
   return (
     <div className="min-vh-100 d-flex flex-column customer-home-wrapper" style={{ marginTop: '80px' }}>
@@ -171,32 +162,8 @@ export default function CustomerHome() {
               </div>
             ) : (
               featuredProducts.map((product) => (
-                <div className="col-md-6 col-lg-3" key={product.id || product.productId}>
-                  <div className="glass-product-card h-100 rounded-4 p-3 shadow-sm position-relative d-flex flex-column">
-                    <div className="product-img-wrapper rounded-3 bg-light mb-3 position-relative overflow-hidden text-center py-4">
-                      <img 
-                        src={product.image ? `http://localhost:8080/uploads/products/${product.image}` : 'https://via.placeholder.com/200?text=Product'} 
-                        alt={product.productName} 
-                        className="img-fluid object-fit-cover rounded"
-                        style={{ height: '140px' }}
-                      />
-                      <span className="position-absolute top-0 start-0 badge bg-success m-2">Organic</span>
-                    </div>
-                    <div className="flex-grow-1">
-                      <span className="text-muted small d-block mb-1">{product.category || 'Fresh Produce'}</span>
-                      <h6 className="fw-bold text-dark mb-2 text-truncate">{product.productName}</h6>
-                      <div className="d-flex align-items-center justify-content-between mt-auto">
-                        <h5 className="fw-extrabold text-success mb-0">₹{product.price}</h5>
-                        <button 
-                          onClick={() => handleAddToCart(product.id || product.productId)} 
-                          className="btn btn-sm btn-success rounded-pill px-3 shadow-sm fw-bold"
-                        >
-                          <i className="bi bi-cart-plus me-1"></i> Add
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <ProductCard key={product.id} product={product} />
+       
               ))
             )}
           </div>
@@ -224,7 +191,7 @@ export default function CustomerHome() {
                 <div className="col-md-4" key={farmer.id || idx}>
                   <div className="glass-farmer-card rounded-4 p-4 text-center shadow-sm h-100">
                     <img 
-                      src={farmer.profilePic ? `http://localhost:8080/uploads/profiles/${farmer.profilePic}` : 'https://via.placeholder.com/90?text=Farmer'} 
+                      src={farmer.profilePic ?farmer.profilePic : 'https://via.placeholder.com/90?text=Farmer'} 
                       alt={farmer.name} 
                       className="rounded-circle border border-3 border-success shadow-sm mb-3 object-fit-cover"
                       style={{ width: '90px', height: '90px' }}
