@@ -186,3 +186,26 @@
   opacity: 0.8;
   transform: translateX(4px);
 }
+@media (max-width: 768px) {
+  /* Forces the product grid container to handle 2 columns cleanly on mobile */
+  .row.g-4 {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    margin-right: -6px !important;
+    margin-left: -6px !important;
+  }
+
+  /* Forces each product card container to take up exactly 50% width side-by-side */
+  .row.g-4 > div {
+    flex: 0 0 50% !important;
+    max-width: 50% !important;
+    padding-right: 6px !important;
+    padding-left: 6px !important;
+    margin-bottom: 12px !important;
+  }
+
+  /* Optional: Adjusts internal product card padding/text size for mobile screens */
+  .row.g-4 .card {
+    height: 100%;
+  }
+}
