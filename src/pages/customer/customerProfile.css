@@ -1,0 +1,31 @@
+/* ==========================================
+   CUSTOMER PROFILE DRIBBBLE STYLES
+========================================== */
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.82) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 10px 30px rgba(31, 38, 135, 0.05) !important;
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.transition-hover {
+  transition: all 0.3s ease;
+}
+
+.transition-hover:hover {
+  transform: translateY(-3px);
+}
+
+.shadow-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(25, 135, 84, 0.2) !important;
+}
+
+@media (min-width: 992px) {
+  .border-start-lg {
+    border-left: 4px solid #198754 !important;
+  }
+}

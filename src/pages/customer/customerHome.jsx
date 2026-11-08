@@ -2,18 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import CustomerNavbar from '../../components/customer/CustomerNavbar';
 import CustomerFooter from '../../components/customer/CustomerFooter';
-import ProductCard from '../../components/customer/ProductCard';
-import { productService } from '../../services/productService';
-import { farmerService } from '../../services/farmerService';
+import api from '../../services/api';
 import { useCart } from '../../context/CartContext';
-
-
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import './CustomerHome.css'; // Dedicated stylesheet for glassmorphism & Dribbble styles
 
 export default function CustomerHome() {
   const { totalItemsCount } = useCart();
   const navigate = useNavigate();
-
+  
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [farmers, setFarmers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,19 +20,19 @@ export default function CustomerHome() {
       try {
         setLoading(true);
         // Fetch products and farmers concurrently
-        const [productsRes, farmersRes] = await Promise.all([
-          productService.getAllProducts ? productService.getAllProducts() : productService.getProductsByFarmer ? productService.getAllProducts() : [],
-          farmerService.getAllFarmers().catch(() => [])
+        const [prodRes, farmerRes] = await Promise.allSettled([
+          api.get('/customer/products'),
+          api.get('/customer/farmers')
         ]);
 
-        // Fallback or slice top items
-        const prods = Array.isArray(productsRes) ? productsRes : (productsRes.data || []);
-        setFeaturedProducts(prods.slice(0, 4));
-
-        const fams = Array.isArray(farmersRes) ? farmersRes : (farmersRes.data || []);
-        setFarmers(fams.slice(0, 3));
+        if (prodRes.status === 'fulfilled') {
+          setFeaturedProducts(prodRes.value.data?.slice(0, 4) || []);
+        }
+        if (farmerRes.status === 'fulfilled') {
+          setFarmers(farmerRes.value.data?.slice(0, 3) || []);
+        }
       } catch (err) {
-        console.warn('Failed to load home dashboard data:', err);
+        console.error('Failed to load home dashboard data:', err);
       } finally {
         setLoading(false);
       }
@@ -44,201 +41,222 @@ export default function CustomerHome() {
     fetchHomeData();
   }, []);
 
-const categories = [
-    { name: 'Vegetables', icon: 'bi-tree', query: 'Vegetables', bg: 'bg-success bg-opacity-15 text-success' },
-    { name: 'Fruits', icon: 'bi-apple', query: 'Fruits', bg: 'bg-warning bg-opacity-15 text-warning' },
-    { name: 'Grains & Pulses', icon: 'bi-layers', query: 'Grains', bg: 'bg-info bg-opacity-15 text-info' },
-    { name: 'Organic Dairy', icon: 'bi-cup-straw', query: 'Dairy', bg: 'bg-primary bg-opacity-15 text-primary' }
-  ];
-
-  const getProfileImageSrc = (imgProp) => {
-    if (!imgProp) return 'https://via.placeholder.com/80?text=Farmer';
-    if (imgProp.startsWith('http://') || imgProp.startsWith('https://')) return imgProp;
-    if (imgProp.includes('/uploads/')) return `${BASE_URL}${imgProp}`;
-    return `${BASE_URL}/uploads/profiles/${imgProp}`;
+  const handleAddToCart = async (productId) => {
+    try {
+      await api.post(`/customer/cart/add?productId=${productId}&quantity=1`);
+      alert('Product added to cart successfully! 🛒');
+    } catch (err) {
+      console.error('Failed to add to cart:', err);
+      alert('Please log in or register to purchase products.');
+      navigate('/login');
+    }
   };
 
   return (
-    <div className="min-vh-100 bg-light d-flex flex-column" style={{marginTop:"130px"}}>
+    <div className="min-vh-100 d-flex flex-column customer-home-wrapper" style={{ marginTop: '80px' }}>
+      {/* Navbar Integration */}
       <CustomerNavbar cartCount={totalItemsCount} />
 
-      {/* Hero Section */}
-      <section className="bg-success text-white py-5 mb-5 shadow-sm rounded-4 container">
-        <div className="row align-items-center py-4 px-3">
-          <div className="col-lg-7 text-center text-lg-start mb-4 mb-lg-0">
-            <span className="badge bg-white text-success px-3 py-2 rounded-pill fw-bold mb-3">
-              <i className="bi bi-shield-check me-1"></i> 100% Direct From Local Farms
-            </span>
-            <h1 className="display-4 fw-bold mb-3">Fresh Harvests Straight to Your Doorstep</h1>
-            <p className="lead mb-4 text-white-50">
-              Support local growers, explore chemical-free organic produce, and enjoy transparent pricing without middlemen.
-            </p>
-            <div className="d-flex justify-content-center justify-content-lg-start gap-3">
-              <Link to="/customer/products" className="btn btn-light text-success btn-lg px-4 fw-bold shadow-sm">
-                Browse Catalog <i className="bi bi-arrow-right ms-2"></i>
-              </Link>
-              <Link to="/customer/farmers" className="btn btn-outline-light btn-lg px-4 fw-bold">
-                Meet Farmers
-              </Link>
+      {/* Hero Section with Glassmorphism & Animated Glow */}
+      <section className="hero-section position-relative overflow-hidden py-5 px-3 px-lg-5 mb-5">
+        <div className="hero-glow-blob blob-1"></div>
+        <div className="hero-glow-blob blob-2"></div>
+
+        <div className="container position-relative z-index-1 py-5">
+          <div className="row align-items-center g-5">
+            <div className="col-lg-7 text-center text-lg-start">
+              <div className="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-success bg-opacity-10 text-success fw-semibold mb-3 animate-fade-in">
+                <i className="bi bi-stars"></i> Direct From Farm to Your Table
+              </div>
+              <h1 className="display-4 fw-extrabold text-dark mb-4 lh-base">
+                Fresh Organic Produce From <span className="text-gradient-success">Local Farmers</span>
+              </h1>
+              <p className="lead text-muted mb-4">
+                Explore a wide range of pesticide-free grains, seasonal vegetables, and farm-fresh fruits. Support local agricultural communities while eating healthy.
+              </p>
+              <div className="d-flex flex-wrap justify-content-center justify-content-lg-start gap-3">
+                <Link to="/customer/products" className="btn btn-success btn-lg rounded-pill px-4 fw-bold shadow-hover">
+                  Explore Products <i className="bi bi-arrow-right ms-2"></i>
+                </Link>
+                <Link to="/customer/farmers" className="btn btn-outline-dark btn-lg rounded-pill px-4 fw-semibold glass-btn">
+                  Meet Our Farmers
+                </Link>
+              </div>
+
+              {/* Quick Trust Metrics */}
+              <div className="row mt-5 pt-3 g-4 text-start border-top border-light">
+                <div className="col-4">
+                  <h3 className="fw-bold text-success mb-0">100%</h3>
+                  <p className="text-muted small mb-0">Organic & Natural</p>
+                </div>
+                <div className="col-4">
+                  <h3 className="fw-bold text-success mb-0">50+</h3>
+                  <p className="text-muted small mb-0">Verified Farmers</p>
+                </div>
+                <div className="col-4">
+                  <h3 className="fw-bold text-success mb-0">24/7</h3>
+                  <p className="text-muted small mb-0">Direct Support</p>
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="col-lg-5 text-center">
-            <div className="p-4 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-25 shadow-lg">
-              <i className="bi bi-tree display-1 text-light mb-2 d-block"></i>
-              <h3 className="fw-bold mb-1">KisanConnect Ecosystem</h3>
-              <p className="text-white-50 fs-7 mb-0">Empowering farmers and nourishing communities with wholesome produce.</p>
+
+            {/* Dribbble Style Floating Glass Feature Card */}
+            <div className="col-lg-5">
+              <div className="hero-glass-card p-4 rounded-4 shadow-lg position-relative float-animation">
+                <div className="d-flex align-items-center gap-3 mb-4">
+                  <div className="bg-success text-white rounded-circle p-3 d-flex align-items-center justify-content-center shadow" style={{ width: '50px', height: '50px' }}>
+                    <i className="bi bi-basket2-fill fs-4"></i>
+                  </div>
+                  <div>
+                    <h6 className="fw-bold text-dark mb-0">Harvest of the Day</h6>
+                    <small className="text-muted">Freshly harvested this morning</small>
+                  </div>
+                </div>
+                <div className="bg-light rounded-3 p-3 mb-3 text-center position-relative overflow-hidden">
+                  <div className="badge bg-danger position-absolute top-0 end-0 m-2">Best Seller</div>
+                  <i className="bi bi-tree-fill display-1 text-success opacity-75 py-3"></i>
+                </div>
+                <div className="d-flex justify-content-between align-items-center">
+                  <div>
+                    <span className="text-muted small d-block">Organic Tomatoes</span>
+                    <h5 className="fw-bold text-success mb-0">₹40 / kg</h5>
+                  </div>
+                  <Link to="/customer/products" className="btn btn-sm btn-dark rounded-pill px-3">
+                    Buy Now
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <main className="container flex-grow-1 pb-5">
-        {/* Categories Section */}
-        <section className="mb-5">
-          <div className="d-flex justify-content-between align-items-center mb-4">
-            <h3 className="fw-bold text-dark mb-0">
-              <i className="bi bi-grid text-success me-2"></i>Explore Categories
-            </h3>
-            <Link to="/customer/products" className="text-success fw-bold text-decoration-none fs-7">
-              View All <i className="bi bi-chevron-right"></i>
-            </Link>
-          </div>
-
-          <div className="row row-cols-2 row-cols-md-4 g-4">
-            {categories.map((cat, idx) => (
-              <div key={idx} className="col">
-                <div
-                  onClick={() => navigate(`/customer/products?category=${cat.query}`)}
-                  className="card border-0 shadow-sm rounded-4 p-4 text-center bg-white h-100 cursor-pointer hover-shadow transition-all"
-                  style={{ cursor: 'pointer' }}
-                >
-                  <div className={`mx-auto mb-3 rounded-circle d-flex align-items-center justify-content-center fs-3`} style={{ width: '60px', height: '60px' }}>
-                    <i className={`bi ${cat.icon} text-success`}></i>
-                  </div>
-                  <h6 className="fw-bold text-dark mb-0">{cat.name}</h6>
-                </div>
+      {/* Main Container */}
+      <main className="container flex-grow-1 pb-5" style={{ maxWidth: '1200px' }}>
+        
+        {/* Category Shortcut Pills */}
+        <div className="row mb-5 text-center g-3">
+          {['All Products', 'Vegetables', 'Fruits', 'Grains & Pulses', 'Dairy & Honey'].map((cat, idx) => (
+            <div className="col-6 col-md-4 col-lg-2 mx-auto" key={idx}>
+              <div className="glass-category-card p-3 rounded-4 shadow-sm h-100 cursor-pointer transition-hover">
+                <i className={`bi ${idx === 0 ? 'bi-grid-fill' : idx === 1 ? 'bi-flower1' : idx === 2 ? 'bi-apple' : idx === 3 ? 'bi-box-seam' : 'bi-cup-hot'} fs-3 text-success mb-2 d-block`}></i>
+                <span className="fw-semibold text-dark small">{cat}</span>
               </div>
-            ))}
-          </div>
-        </section>
+            </div>
+          ))}
+        </div>
 
         {/* Featured Products Section */}
         <section className="mb-5">
           <div className="d-flex justify-content-between align-items-center mb-4">
             <div>
-              <h3 className="fw-bold text-dark mb-1">
-                <i className="bi bi-basket text-success me-2"></i>Fresh Harvests Available Now
-              </h3>
-              <p className="text-muted fs-7 mb-0">Handpicked organic produce harvested directly by verified farmers.</p>
+              <h3 className="fw-extrabold text-dark m-0">Featured Fresh Products</h3>
+              <p className="text-muted small m-0">Handpicked items directly from verified organic farmers</p>
             </div>
-            <Link to="/customer/products" className="btn btn-outline-success btn-sm rounded-pill px-3">
-              View All Products
+            <Link to="/customer/products" className="text-success fw-bold text-decoration-none hover-link">
+              View All <i className="bi bi-arrow-right"></i>
             </Link>
           </div>
 
-          {loading ? (
-            <div className="text-center py-5">
-              <div className="spinner-border text-success" role="status"></div>
-            </div>
-          ) : featuredProducts.length === 0 ? (
-            <div className="card border-0 shadow-sm text-center py-4 rounded-4 bg-white">
-              <p className="text-muted mb-0">No featured products currently available.</p>
-            </div>
-          ) : (
-            <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
-              {featuredProducts.map((prod) => (
-                <div key={prod.productId || prod.id} className="col">
-                  <ProductCard product={prod} />
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-
-        {/* Meet Our Farmers Preview */}
-        <section className="mb-5 pt-3">
-          <div className="d-flex justify-content-between align-items-center mb-4">
-            <div>
-              <h3 className="fw-bold text-dark mb-1">
-                <i className="bi bi-people text-success me-2"></i>Meet Our Dedicated Farmers
-              </h3>
-              <p className="text-muted fs-7 mb-0">Get to know the hardworking growers behind your food.</p>
-            </div>
-            <Link to="/customer/farmers" className="btn btn-outline-success btn-sm rounded-pill px-3">
-              Explore All Farmers
-            </Link>
-          </div>
-
-          {farmers.length === 0 ? (
-            <div className="card border-0 shadow-sm text-center py-4 rounded-4 bg-white">
-              <p className="text-muted mb-0">Farmer profiles loading...</p>
-            </div>
-          ) : (
-            <div className="row row-cols-1 row-cols-md-3 g-4">
-              {farmers.map((farmer) => {
-                const farmerId = farmer.id || farmer.farmerId;
-                const farmerName = farmer.name || 'Local Farmer';
-                const rating = farmer.rating ? Number(farmer.rating).toFixed(1) : '4.8';
-
-                return (
-                  <div key={farmerId} className="col">
-                    <div className="card border-0 shadow-sm rounded-4 p-4 bg-white h-100 text-center d-flex flex-column">
-                      <div className="mx-auto mb-3">
-                        <img
-                          src={getProfileImageSrc(farmer.profilePic)}
-                          alt={farmerName}
-                          className="rounded-circle object-fit-cover border shadow-sm"
-                          style={{ width: '80px', height: '80px' }}
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = 'https://via.placeholder.com/80?text=Farmer';
-                          }}
-                        />
+          <div className="row g-4">
+            {loading ? (
+              <div className="text-center py-5">
+                <div className="spinner-border text-success" role="status"></div>
+              </div>
+            ) : featuredProducts.length === 0 ? (
+              <div className="text-center py-5 text-muted glass-card rounded-4 p-4">
+                <p className="mb-0">No featured products available at the moment.</p>
+              </div>
+            ) : (
+              featuredProducts.map((product) => (
+                <div className="col-md-6 col-lg-3" key={product.id || product.productId}>
+                  <div className="glass-product-card h-100 rounded-4 p-3 shadow-sm position-relative d-flex flex-column">
+                    <div className="product-img-wrapper rounded-3 bg-light mb-3 position-relative overflow-hidden text-center py-4">
+                      <img 
+                        src={product.image ? `http://localhost:8080/uploads/products/${product.image}` : 'https://via.placeholder.com/200?text=Product'} 
+                        alt={product.productName} 
+                        className="img-fluid object-fit-cover rounded"
+                        style={{ height: '140px' }}
+                      />
+                      <span className="position-absolute top-0 start-0 badge bg-success m-2">Organic</span>
+                    </div>
+                    <div className="flex-grow-1">
+                      <span className="text-muted small d-block mb-1">{product.category || 'Fresh Produce'}</span>
+                      <h6 className="fw-bold text-dark mb-2 text-truncate">{product.productName}</h6>
+                      <div className="d-flex align-items-center justify-content-between mt-auto">
+                        <h5 className="fw-extrabold text-success mb-0">₹{product.price}</h5>
+                        <button 
+                          onClick={() => handleAddToCart(product.id || product.productId)} 
+                          className="btn btn-sm btn-success rounded-pill px-3 shadow-sm fw-bold"
+                        >
+                          <i className="bi bi-cart-plus me-1"></i> Add
+                        </button>
                       </div>
-                      <h5 className="fw-bold text-dark mb-1">{farmerName}</h5>
-                      <span className="text-warning fs-8 mb-2">
-                        <i className="bi bi-star-fill me-1"></i> {rating} / 5.0
-                      </span>
-                      <p className="text-muted fs-8 mb-4 flex-grow-1">
-                        {farmer.bio || 'Dedicated to organic and sustainable agricultural practices.'}
-                      </p>
-                      <Link
-                         to={`/customer/products/farmer/${farmer.Id}`}
-                        className="btn btn-outline-success btn-sm rounded-pill"
-                      >
-                        View Their Harvest <i className="bi bi-arrow-right ms-1"></i>
-                      </Link>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          )}
-        </section>
-
-        {/* Why Choose KisanConnect Banner */}
-        <section className="card border-0 shadow-sm rounded-4 bg-white p-5 text-center my-5">
-          <h3 className="fw-bold text-dark mb-3">Why Choose KisanConnect?</h3>
-          <div className="row g-4 mt-2">
-            <div className="col-md-4">
-              <i className="bi bi-truck display-5 text-success mb-2 d-block"></i>
-              <h5 className="fw-bold text-dark">Direct Farm Delivery</h5>
-              <p className="text-muted fs-7 mb-0">Harvested fresh and shipped promptly from local farms to your home.</p>
-            </div>
-            <div className="col-md-4">
-              <i className="bi bi-shield-check display-5 text-success mb-2 d-block"></i>
-              <h5 className="fw-bold text-dark">Verified Growers</h5>
-              <p className="text-muted fs-7 mb-0">Every farmer on our platform is verified for quality and safety standards.</p>
-            </div>
-            <div className="col-md-4">
-              <i className="bi bi-cash-coin display-5 text-success mb-2 d-block"></i>
-              <h5 className="fw-bold text-dark">Fair Farmer Pricing</h5>
-              <p className="text-muted fs-7 mb-0">Farmers earn fair compensation for their hard work without unfair middlemen markups.</p>
-            </div>
+                </div>
+              ))
+            )}
           </div>
         </section>
+
+        {/* Meet Our Farmers Section */}
+        <section className="mb-5">
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h3 className="fw-extrabold text-dark m-0">Meet Our Local Farmers</h3>
+              <p className="text-muted small m-0">The hardworking hands behind your healthy food</p>
+            </div>
+            <Link to="/customer/farmers" className="text-success fw-bold text-decoration-none hover-link">
+              View All <i className="bi bi-arrow-right"></i>
+            </Link>
+          </div>
+
+          <div className="row g-4">
+            {farmers.length === 0 ? (
+              <div className="text-center py-4 text-muted glass-card rounded-4 p-4 col-12">
+                <p className="mb-0">Farmers profiles loading...</p>
+              </div>
+            ) : (
+              farmers.map((farmer, idx) => (
+                <div className="col-md-4" key={farmer.id || idx}>
+                  <div className="glass-farmer-card rounded-4 p-4 text-center shadow-sm h-100">
+                    <img 
+                      src={farmer.profilePic ? `http://localhost:8080/uploads/profiles/${farmer.profilePic}` : 'https://via.placeholder.com/90?text=Farmer'} 
+                      alt={farmer.name} 
+                      className="rounded-circle border border-3 border-success shadow-sm mb-3 object-fit-cover"
+                      style={{ width: '90px', height: '90px' }}
+                    />
+                    <h5 className="fw-bold text-dark mb-1">{farmer.name || 'Local Farmer'}</h5>
+                    <p className="text-muted small mb-2"><i className="bi bi-geo-alt-fill text-success me-1"></i>{farmer.location || 'Kurnool District'}</p>
+                    <div className="badge bg-success bg-opacity-10 text-success px-3 py-1 rounded-pill mb-3">
+                      <i className="bi bi-patch-check-fill me-1"></i> Verified Producer
+                    </div>
+                    <Link to="/customer/farmers" className="btn btn-outline-success btn-sm w-100 rounded-pill fw-bold">
+                      View Farm Profile
+                    </Link>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
+
+        {/* Promotional Dribbble Style Banner */}
+        <section className="promo-banner-card rounded-4 p-5 text-white position-relative overflow-hidden shadow-lg mb-4">
+          <div className="position-relative z-index-1 max-w-500">
+            <span className="badge bg-light text-success fw-bold mb-3 px-3 py-2 rounded-pill">Special Initiative</span>
+            <h2 className="fw-extrabold mb-3">Empowering Local Agriculture Together</h2>
+            <p className="lead mb-4 opacity-75">Every purchase you make goes directly toward supporting sustainable farming practices and fair wages for local rural growers.</p>
+            <Link to="/customer/products" className="btn btn-light text-success fw-bold px-4 py-2 rounded-pill shadow">
+              Start Shopping Now
+            </Link>
+          </div>
+        </section>
+
       </main>
 
+      {/* Footer Integration */}
       <CustomerFooter />
     </div>
   );

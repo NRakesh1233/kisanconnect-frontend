@@ -273,14 +273,43 @@ export default function Dashboard() {
             </div>
 
             {/* Harvest Tips */}
-            <div className="content-card-animate custom-dash-card bg-success text-white">
-              <h4 className="fw-bold mb-3"><i className="bi bi-flower2 me-2"></i> Seasonal Harvest Guide</h4>
-              <ul className="list-unstyled mb-0 small opacity-90 d-flex flex-col gap-2">
-                <li className="py-1 border-bottom border-white border-opacity-25">🌱 Maintain moisture control during early morning watering cycles.</li>
-                <li className="py-1 border-bottom border-white border-opacity-25">📦 Pack leafy greens with ventilated eco-wraps to retain crisp freshness.</li>
-                <li className="py-1">☀️ Review localized weather forecast prior to scheduling bulk packaging.</li>
-              </ul>
-            </div>
+           {/* Harvest Tips / Seasonal Harvest Guide */}
+           <div className="card border-success border-opacity-25 shadow-sm rounded-4 p-4 mb-4" style={{ background: 'rgba(255, 255, 255, 0.9)', backdropFilter: 'blur(12px)' }}>
+  <h4 className="fw-bold mb-3 fs-5 d-flex align-items-center gap-2 text-success">
+    <i className="bi bi-flower2"></i> Seasonal Harvest Guide
+  </h4>
+  <ul className="list-unstyled mb-0 small text-dark d-flex flex-column gap-3">
+    <li className="py-2 border-bottom border-black border-opacity-10 d-flex align-items-start gap-3">
+      <div className="rounded-circle bg-success bg-opacity-10 text-success p-2 d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: '38px', height: '38px' }}>
+        <i className="bi bi-droplet-half fs-6"></i>
+      </div>
+      <div>
+        <strong className="d-block text-dark mb-0.5">Moisture Control</strong>
+        <span className="text-secondary small">Maintain moisture control during early morning watering cycles.</span>
+      </div>
+    </li>
+    
+    <li className="py-2 border-bottom border-black border-opacity-10 d-flex align-items-start gap-3">
+      <div className="rounded-circle bg-success bg-opacity-10 text-success p-2 d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: '38px', height: '38px' }}>
+        <i className="bi bi-box-seam fs-6"></i>
+      </div>
+      <div>
+        <strong className="d-block text-dark mb-0.5">Eco Packaging</strong>
+        <span className="text-secondary small">Pack leafy greens with ventilated eco-wraps to retain crisp freshness.</span>
+      </div>
+    </li>
+    
+    <li className="py-2 d-flex align-items-start gap-3">
+      <div className="rounded-circle bg-success bg-opacity-10 text-success p-2 d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: '38px', height: '38px' }}>
+        <i className="bi bi-sun-fill fs-6"></i>
+      </div>
+      <div>
+        <strong className="d-block text-dark mb-0.5">Weather Tracking</strong>
+        <span className="text-secondary small">Review localized weather forecast prior to scheduling bulk packaging.</span>
+      </div>
+    </li>
+  </ul>
+</div>
 
           </div>
 
@@ -325,8 +354,8 @@ export default function Dashboard() {
                       <td className="fw-bold">₹{ord.totalAmount}</td>
                       <td>
                         <span className={` px-3 py-2 rounded-pill ${
-                          ord.orderStatus === 'ACCEPTED' ? 'bg-primary' :
-                          ord.orderStatus=== 'PENDING' ? 'bg-warning text-dark' : 'bg-success'
+                          ord.orderStatus === 'ACCEPTED' ? 'bg-success' :
+                          ord.orderStatus=== 'PENDING' ? 'bg-secondary text-dark' : 'bg-success'
                         }`}>
                           {ord.orderStatus}
                         </span>

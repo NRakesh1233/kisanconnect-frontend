@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import CustomerNavbar from '../../components/customer/CustomerNavbar';
 import ProductCard from '../../components/customer/ProductCard';
 import ProductFilter from '../../components/customer/ProductFilter';
 import { useCart } from '../../context/CartContext';
 import { productService } from '../../services/productService';
+import gsap from 'gsap';
 
 export default function ProductCatalog() {
   const { totalItemsCount } = useCart();
@@ -19,6 +20,8 @@ export default function ProductCatalog() {
   const [maxPrice, setMaxPrice] = useState(1000);
   const [sortBy, setSortBy] = useState('featured');
 
+  const gridRef = useRef(null);
+
   // Load Products & Categories from API
   useEffect(() => {
     const fetchData = async () => {
@@ -29,7 +32,6 @@ export default function ProductCatalog() {
         const [productsData, categoriesData] = await Promise.allSettled([
           productService.getAllProducts(),
           ['vegetables', 'fruits', 'grains', 'organic produce']
-          // productService.getCategories()
         ]);
 
         if (productsData.status === 'fulfilled') {
@@ -52,7 +54,7 @@ export default function ProductCatalog() {
   }, []);
 
   // Filter & Sort logic computed in-memory
-  const filteredProducts = useMemo(() => {
+  const filteredProducts = React.useMemo(() => {
     return products
       .filter((product) => {
         const matchesSearch =
@@ -76,6 +78,28 @@ export default function ProductCatalog() {
       });
   }, [products, searchTerm, selectedCategory, maxPrice, sortBy]);
 
+  // GSAP Stagger animation when filtered products change
+  useEffect(() => {
+    if (!loading && gridRef.current) {
+      const cards = gridRef.current.querySelectorAll('.product-card-item');
+      if (cards.length > 0) {
+        gsap.fromTo(
+          cards,
+          { opacity: 0, y: 30, scale: 0.96 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.4,
+            stagger: 0.05,
+            ease: 'power2.out',
+            overwrite: 'auto'
+          }
+        );
+      }
+    }
+  }, [filteredProducts, loading]);
+
   const handleResetFilters = () => {
     setSearchTerm('');
     setSelectedCategory('');
@@ -84,22 +108,28 @@ export default function ProductCatalog() {
   };
 
   return (
-    <div className="min-vh-100 d-flex flex-column bg-light">
+    <div className="min-vh-100 d-flex flex-column" style={{ background: 'linear-gradient(135deg, #f6f9fc 0%, #eef4f1 100%)' }}>
       <CustomerNavbar cartCount={totalItemsCount} />
 
-      {/* Added responsive top margin and generous bottom padding (pb-5) to prevent cutoff */}
+      {/* Main Container with top and bottom spacing for mobile bottom dock */}
       <main className="container py-4 mb-5 flex-grow-1" style={{ marginTop: '80px' }}>
-        {/* Banner Section */}
-        <div className="p-4 mb-4 rounded-3 text-white shadow-sm" style={{ backgroundColor: 'var(--kisan-forest-green, #1b4d3e)' }}>
-          <div className="row align-items-center">
-            <div className="col-md-8">
-              <h2 className="fw-bold mb-1">Fresh Harvest, Directly from Local Farmers</h2>
-              <p className="mb-0 text-light opacity-85">
-                Support your community agriculture. Choose from fresh vegetables, fruits, grains, and organic produce.
+        
+        {/* Glassmorphic Banner Section */}
+        <div className="glass-banner p-4 p-lg-5 mb-4 rounded-4 text-white shadow-sm position-relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #12372A 0%, #1B4D3E 100%)' }}>
+          <div className="row align-items-center position-relative z-1">
+            <div className="col-lg-8">
+              <span className="badge bg-success bg-opacity-25 text-success-light px-3 py-1 rounded-pill mb-2 fw-semibold fs-8 border border-success border-opacity-25">
+                <i className="bi bi-patch-check-fill me-1"></i> Direct From Farms
+              </span>
+              <h2 className="fw-extrabold mb-2 text-white">Fresh Harvest, Directly from Local Farmers</h2>
+              <p className="mb-0 text-light opacity-85 fs-6 lh-base">
+                Support your community agriculture. Choose from pesticide-free vegetables, seasonal fruits, grains, and organic produce.
               </p>
             </div>
-            <div className="col-md-4 text-md-end mt-3 mt-md-0 d-none d-md-block">
-              <i className="bi bi-flower1 display-3 text-success"></i>
+            <div className="col-lg-4 text-lg-end mt-3 mt-lg-0 d-none d-lg-block">
+              <div className="display-3 text-success opacity-75">
+                <i className="bi bi-basket3"></i>
+              </div>
             </div>
           </div>
         </div>
@@ -125,40 +155,40 @@ export default function ProductCatalog() {
           {/* Right Product Grid */}
           <div className="col-lg-9 col-md-8">
             {loading ? (
-              <div className="text-center py-5">
+              <div className="text-center py-5 glass-panel rounded-4">
                 <div className="spinner-border text-success" role="status" style={{ width: '3rem', height: '3rem' }}>
                   <span className="visually-hidden">Loading products...</span>
                 </div>
-                <p className="mt-3 text-muted">Loading fresh produce for you...</p>
+                <p className="mt-3 text-muted fw-medium">Loading fresh produce for you...</p>
               </div>
             ) : error ? (
-              <div className="alert alert-danger text-center my-4" role="alert">
-                <i className="bi bi-exclamation-triangle-fill fs-4 d-block mb-2"></i>
+              <div className="alert alert-danger border-0 shadow-sm rounded-4 text-center my-4 py-4 bg-danger bg-opacity-15 text-danger fw-semibold" role="alert">
+                <i className="bi bi-exclamation-triangle-fill fs-3 d-block mb-2"></i>
                 {error}
               </div>
             ) : filteredProducts.length === 0 ? (
-              <div className="card border-0 shadow-sm text-center py-5">
-                <div className="card-body">
-                  <i className="bi bi-search text-muted display-4 d-block mb-3"></i>
+              <div className="glass-panel card border-0 shadow-sm text-center py-5 rounded-4">
+                <div className="card-body py-5">
+                  <i className="bi bi-search text-success display-4 d-block mb-3 opacity-50"></i>
                   <h5 className="fw-bold text-dark">No products found</h5>
-                  <p className="text-muted">Try adjusting your filter search criteria or price range.</p>
-                  <button onClick={handleResetFilters} className="btn btn-kisan-primary btn-sm mt-2">
+                  <p className="text-muted small mb-3">Try adjusting your filter search criteria or price range.</p>
+                  <button onClick={handleResetFilters} className="btn btn-success btn-sm rounded-pill px-4 fw-bold shadow-hover">
                     Clear All Filters
                   </button>
                 </div>
               </div>
             ) : (
               <div>
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                  <span className="text-muted fs-7 fw-medium">
-                    Showing <strong className="text-dark">{filteredProducts.length}</strong> products
+                <div className="d-flex justify-content-between align-items-center mb-3 px-1">
+                  <span className="text-muted fs-7 fw-semibold">
+                    Showing <strong className="text-dark">{filteredProducts.length}</strong> available products
                   </span>
                 </div>
 
-                {/* Product Grid */}
-                <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
+                {/* Animated Product Grid */}
+                <div ref={gridRef} className="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
                   {filteredProducts.map((product) => (
-                    <div key={product.id} className="col">
+                    <div key={product.id || product.productId} className="col product-card-item">
                       <ProductCard product={product} />
                     </div>
                   ))}

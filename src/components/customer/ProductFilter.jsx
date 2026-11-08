@@ -2,7 +2,7 @@ import React from 'react';
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap.bundle.js";
 import "bootstrap-icons/font/bootstrap-icons.css";
-
+import './productCard.css';
 export default function ProductFilter({
   categories = [],
   searchTerm,
@@ -16,14 +16,18 @@ export default function ProductFilter({
   onResetFilters
 }) {
   return (
-    <div className="card shadow-sm border-0 p-3 mb-4 sticky-top" style={{ top: '80px', zIndex: 10 }}>
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h5 className="fw-bold mb-0 text-dark">
-          <i className="bi bi-funnel text-success me-2"></i>Filters
+    <div className="glass-panel card border-0 p-4 mb-4 sticky-top rounded-4 shadow-sm" style={{ top: '90px', zIndex: 10 }}>
+      {/* Header & Reset */}
+      <div className="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <h5 className="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+          <div className="bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center" style={{ width: '30px', height: '30px' }}>
+            <i className="bi bi-funnel fs-7"></i>
+          </div>
+          <span>Filters</span>
         </h5>
         <button
           onClick={onResetFilters}
-          className="btn btn-link btn-sm text-decoration-none text-muted p-0"
+          className="btn btn-link btn-sm text-decoration-none text-muted p-0 fw-semibold fs-8 hover-success"
         >
           Reset All
         </button>
@@ -31,16 +35,16 @@ export default function ProductFilter({
 
       {/* Search Input */}
       <div className="mb-4">
-        <label className="form-label fw-medium text-secondary" style={{ fontSize: '0.875rem' }}>Search Products</label>
-        <div className="d-flex align-items-center border rounded overflow-hidden bg-light">
-          <span className=" bg-light border-end-0">
-            <i className="bi bi-search text-muted"></i>
+        <label className="form-label fw-bold text-secondary text-uppercase fs-8 tracking-wider mb-2">Search Products</label>
+        <div className="d-flex align-items-center rounded-pill px-3 py-1 bg-white border shadow-none transition-all focus-ring">
+          <span className="text-muted me-2">
+            <i className="bi bi-search"></i>
           </span>
           <input
             type="text"
-            className="form-control bg-light border-start-0"
+            className="form-control bg-transparent border-0 shadow-none px-0"
             style={{ fontSize: '0.875rem' }}
-            placeholder="Search by name, category..."
+            placeholder="Search produce, farmer..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -49,9 +53,9 @@ export default function ProductFilter({
 
       {/* Sort By Dropdown */}
       <div className="mb-4">
-        <label className="form-label fw-medium text-secondary" style={{ fontSize: '0.875rem' }}>Sort By</label>
+        <label className="form-label fw-bold text-secondary text-uppercase fs-8 tracking-wider mb-2">Sort By</label>
         <select
-          className="form-select"
+          className="form-select rounded-pill px-3 py-2 bg-white border shadow-none text-dark fw-medium"
           style={{ fontSize: '0.875rem' }}
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
@@ -65,35 +69,34 @@ export default function ProductFilter({
 
       {/* Category Selection */}
       <div className="mb-4">
-        <label className="form-label fw-medium text-secondary" style={{ fontSize: '0.875rem' }}>Categories</label>
-        <div className="d-flex flex-column gap-2 overflow-auto" style={{ maxHeight: '200px' }}>
-          <div className="form-check">
+        <label className="form-label fw-bold text-secondary text-uppercase fs-8 tracking-wider mb-2">Categories</label>
+        <div className="d-flex flex-column gap-2.5 overflow-auto pe-1" style={{ maxHeight: '210px' }}>
+          <div className="form-check custom-radio-item">
             <input
-              className="form-check-input"
+              className="form-check-input custom-checkbox"
               type="radio"
               name="categoryRadio"
               id="cat-all"
               checked={selectedCategory === ''}
               onChange={() => setSelectedCategory('')}
             />
-            <label className="form-check-label text-dark" style={{ fontSize: '0.875rem' }} htmlFor="cat-all">
+            <label className="form-check-label text-dark fw-medium cursor-pointer" style={{ fontSize: '0.875rem' }} htmlFor="cat-all">
               All Categories
             </label>
           </div>
           {categories.map((cat, index) => {
             const catId = cat.id || index;
-            // const catValue = cat.name;
             return (
-              <div key={catId} className="form-check">
+              <div key={catId} className="form-check custom-radio-item">
                 <input
-                  className="form-check-input"
+                  className="form-check-input custom-checkbox"
                   type="radio"
                   name="categoryRadio"
                   id={`cat-${catId}`}
                   checked={selectedCategory === cat}
                   onChange={() => setSelectedCategory(cat.toLowerCase())}
                 />
-                <label className="form-check-label text-dark" style={{ fontSize: '0.875rem' }} htmlFor={`cat-${catId}`}>
+                <label className="form-check-label text-dark fw-medium cursor-pointer" style={{ fontSize: '0.875rem' }} htmlFor={`cat-${catId}`}>
                   {cat.charAt(0).toUpperCase() + cat.slice(1)}
                 </label>
               </div>
@@ -103,23 +106,23 @@ export default function ProductFilter({
       </div>
 
       {/* Price Range Filter */}
-      <div className="mb-2">
-        <div className="d-flex justify-content-between align-items-center mb-1">
-          <label className="form-label fw-medium text-secondary mb-0" style={{ fontSize: '0.875rem' }}>Max Price</label>
-          <span className="fw-bold text-success" style={{ fontSize: '0.875rem' }}>₹{maxPrice}</span>
+      <div className="mb-2 pt-2 border-top">
+        <div className="d-flex justify-content-between align-items-center mb-2">
+          <label className="form-label fw-bold text-secondary text-uppercase fs-8 tracking-wider mb-0">Max Price</label>
+          <span className="fw-extrabold text-success fs-6">₹{maxPrice}</span>
         </div>
         <input
           type="range"
-          className="form-range"
+          className="form-range accent-success cursor-pointer"
           min="10"
-          max="1000"
+          max="2000"
           step="10"
           value={maxPrice}
           onChange={(e) => setMaxPrice(Number(e.target.value))}
         />
-        <div className="d-flex justify-content-between text-muted" style={{ fontSize: '0.75rem' }}>
+        <div className="d-flex justify-content-between text-muted fs-8 fw-semibold">
           <span>₹10</span>
-          <span>₹1000</span>
+          <span>₹2000</span>
         </div>
       </div>
     </div>
