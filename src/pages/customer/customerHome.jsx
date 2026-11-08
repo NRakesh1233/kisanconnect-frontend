@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import CustomerNavbar from '../../components/customer/CustomerNavbar';
 import CustomerFooter from '../../components/customer/CustomerFooter';
 import api from '../../services/api';
+import ProductCard from '../../components/customer/ProductCard';
 import { useCart } from '../../context/CartContext';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './CustomerHome.css'; // Dedicated stylesheet for glassmorphism & Dribbble styles
