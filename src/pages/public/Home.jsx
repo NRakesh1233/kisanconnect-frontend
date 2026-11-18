@@ -96,7 +96,7 @@ export const Home = () => {
   }, []);
 
   // GSAP Entrance and ScrollTrigger Animations
-  useScrollAnimation((gsap, ScrollTrigger) => {
+  useScrollAnimation((gsap) => {
     // Hero Entrance
     gsap.from('.kc-hero-anim-item', {
       y: 35,

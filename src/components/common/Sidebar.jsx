@@ -20,6 +20,7 @@ export const Sidebar = ({ mobileOpen, setMobileOpen }) => {
     { label: 'Harvest Inventory', path: '/dashboard/products', icon: 'bi-box-seam' },
     { label: 'Orders Hub', path: '/dashboard/orders', icon: 'bi-receipt' },
     { label: 'Upload Produce', path: '/dashboard/products/add', icon: 'bi-plus-circle' },
+    { label: 'Earnings', path: '/dashboard/earnings', icon: 'bi-wallet2' },
     { label: 'Farm Profile', path: '/dashboard/profile', icon: 'bi-person-badge' },
   ];
 

@@ -85,9 +85,6 @@ export const FarmerStorefront = () => {
     district,
     state,
     location = 'Local Agricultural Region',
-    mobileNumber,
-    phone,
-    email,
     rating = 4.9,
   } = farmer;
 

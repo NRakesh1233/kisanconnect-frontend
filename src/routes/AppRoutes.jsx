@@ -11,14 +11,17 @@ import Home from '../pages/public/Home';
 import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
 
+// Redesigned Farmer Portal Pages (Step 6)
+import FarmerDashboard from '../pages/farmer/FarmerDashboard';
+import FarmerProducts from '../pages/farmer/FarmerProducts';
+import AddProduct from '../pages/farmer/AddProduct';
+import UpdateProduct from '../pages/farmer/UpdateProduct';
+import FarmerOrders from '../pages/farmer/FarmerOrders';
+import FarmerProfile from '../pages/farmer/FarmerProfile';
+import FarmerEarnings from '../pages/farmer/FarmerEarnings';
+
 // Existing Pages (Incremental migration preservation)
 import Products from '../components/products/products';
-import Dashboard from '../components/dashboard/dashboard';
-import Orders from '../OrderManagement/ordermanagement';
-import FarmerProducts from '../components/inovetary/inovetory';
-import AddProduct from '../components/products/addProduct';
-import UpdateProduct from '../components/products/updateProduct';
-import FarmerProfile from '../components/navbar/profile';
 import { ProductsOnFarmer } from '../pages/productsonfarmer/FarmerProducts';
 
 import CustomerHome from '../pages/customer/customerHome';
@@ -57,50 +60,18 @@ export function AppRoutes() {
         path="/dashboard"
         element={
           <ProtectedRoute allowedRoles={[ROLES.FARMER]}>
-            <Dashboard />
+            <FarmerLayout />
           </ProtectedRoute>
         }
-      />
-      <Route
-        path="/dashboard/orders"
-        element={
-          <ProtectedRoute allowedRoles={[ROLES.FARMER]}>
-            <Orders />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/dashboard/products"
-        element={
-          <ProtectedRoute allowedRoles={[ROLES.FARMER]}>
-            <FarmerProducts />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/dashboard/products/add"
-        element={
-          <ProtectedRoute allowedRoles={[ROLES.FARMER]}>
-            <AddProduct />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/dashboard/products/update/:pid"
-        element={
-          <ProtectedRoute allowedRoles={[ROLES.FARMER]}>
-            <UpdateProduct />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/dashboard/profile"
-        element={
-          <ProtectedRoute allowedRoles={[ROLES.FARMER]}>
-            <FarmerProfile />
-          </ProtectedRoute>
-        }
-      />
+      >
+        <Route index element={<FarmerDashboard />} />
+        <Route path="products" element={<FarmerProducts />} />
+        <Route path="products/add" element={<AddProduct />} />
+        <Route path="products/update/:pid" element={<UpdateProduct />} />
+        <Route path="orders" element={<FarmerOrders />} />
+        <Route path="profile" element={<FarmerProfile />} />
+        <Route path="earnings" element={<FarmerEarnings />} />
+      </Route>
 
       {/* ========================================================
           3. CUSTOMER PORTAL ROUTES (Protected / Customer Session)

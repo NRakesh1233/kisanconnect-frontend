@@ -14,6 +14,22 @@ export const ProductCard = ({ product }) => {
   const [addedNotice, setAddedNotice] = useState(false);
   const cardRef = useRef(null);
 
+  // GSAP subtle entrance animation
+  useEffect(() => {
+    const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (isReduced || !cardRef.current || !product) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        cardRef.current,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out' }
+      );
+    }, cardRef);
+
+    return () => ctx.revert();
+  }, [product]);
+
   if (!product) return null;
 
   // Destructure exact fields from your ProductsResponse DTO
@@ -46,22 +62,6 @@ export const ProductCard = ({ product }) => {
   const isFavorite = isInWishlist(actualId);
   const imgUrl = resolveProductImageUrl(image || productImage);
   const farmerAvatar = resolveProfileImageUrl(profilePic);
-
-  // GSAP subtle entrance animation
-  useEffect(() => {
-    const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (isReduced || !cardRef.current) return;
-
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        cardRef.current,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out' }
-      );
-    }, cardRef);
-
-    return () => ctx.revert();
-  }, []);
 
   const handleAddToCart = async (e) => {
     e.preventDefault();

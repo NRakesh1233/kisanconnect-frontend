@@ -87,10 +87,10 @@ export const ProductCatalog = () => {
       });
   }, [products, searchTerm, selectedCategory, maxPrice, sortBy]);
 
-  // Reset to first page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, selectedCategory, maxPrice, sortBy]);
+  const handleSearchChange = (val) => { setSearchTerm(val); setCurrentPage(1); };
+  const handleCategoryChange = (val) => { setSelectedCategory(val); setCurrentPage(1); };
+  const handleMaxPriceChange = (val) => { setMaxPrice(val); setCurrentPage(1); };
+  const handleSortChange = (val) => { setSortBy(val); setCurrentPage(1); };
 
   // Pagination slicing
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
@@ -157,13 +157,13 @@ export const ProductCatalog = () => {
           <ProductFilter
             categories={categories}
             searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
+            setSearchTerm={handleSearchChange}
             selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
+            setSelectedCategory={handleCategoryChange}
             maxPrice={maxPrice}
-            setMaxPrice={setMaxPrice}
+            setMaxPrice={handleMaxPriceChange}
             sortBy={sortBy}
-            setSortBy={setSortBy}
+            setSortBy={handleSortChange}
             onResetFilters={handleResetFilters}
           />
         </div>
@@ -179,7 +179,7 @@ export const ProductCatalog = () => {
                   Category: {selectedCategory}
                   <i
                     className="bi bi-x-circle cursor-pointer ms-1"
-                    onClick={() => setSelectedCategory('')}
+                    onClick={() => handleCategoryChange('')}
                     style={{ cursor: 'pointer' }}
                   ></i>
                 </span>
@@ -189,7 +189,7 @@ export const ProductCatalog = () => {
                   Query: "{searchTerm}"
                   <i
                     className="bi bi-x-circle cursor-pointer ms-1"
-                    onClick={() => setSearchTerm('')}
+                    onClick={() => handleSearchChange('')}
                     style={{ cursor: 'pointer' }}
                   ></i>
                 </span>

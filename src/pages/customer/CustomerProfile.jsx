@@ -103,6 +103,15 @@ export const CustomerProfile = () => {
 
   const avatarUrl = resolveProfileImageUrl(profile.profilePic || user?.profilePic);
 
+  if (loading) {
+    return (
+      <div className="kc-container py-5 text-center my-5">
+        <div className="spinner-border text-success" role="status" style={{ width: '3rem', height: '3rem' }}></div>
+        <p className="mt-3 text-muted small fw-semibold">Loading your account profile...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="kc-container py-4">
       {/* Header */}

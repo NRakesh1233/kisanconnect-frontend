@@ -20,49 +20,53 @@ export const OrderDetails = () => {
 
   const isJustPlaced = location.state?.orderSuccess || orderId === 'success';
 
-  const fetchOrderDetails = async () => {
-    try {
-      setLoading(true);
-      let targetId = orderId;
-
-      if (!targetId || targetId === 'success') {
-        const orders = await customerService.getCustomerOrders();
-        if (orders && orders.length > 0) {
-          targetId = orders[0].orderId || orders[0].id;
-        }
-      }
-
-      if (targetId && targetId !== 'success') {
-        const data = await customerService.getOrderById(targetId);
-        setOrder(data);
-
-        // Fetch existing review for each item if backend provides order items
-        if (data?.orderItems && data.orderItems.length > 0) {
-          const reviewMap = {};
-          for (const item of data.orderItems) {
-            const oid = item.orderItemId || item.OrderItemId || item.id;
-            try {
-              const res = await customerService.getOrderItemReview(oid);
-              if (res) reviewMap[oid] = res;
-            } catch {
-              // No existing review found for item
-            }
-          }
-          setExistingReviewsMap(reviewMap);
-        }
-      } else {
-        setError('No valid order reference found.');
-      }
-    } catch (err) {
-      console.warn('Failed to fetch order details:', err);
-      setError('Could not retrieve order details.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchOrderDetails();
+    let isMounted = true;
+    const fetchOrder = async () => {
+      try {
+        setLoading(true);
+        let targetId = orderId;
+
+        if (!targetId || targetId === 'success') {
+          const orders = await customerService.getCustomerOrders();
+          if (orders && orders.length > 0) {
+            targetId = orders[0].orderId || orders[0].id;
+          }
+        }
+
+        if (targetId && targetId !== 'success') {
+          const data = await customerService.getOrderById(targetId);
+          if (isMounted) setOrder(data);
+
+          // Fetch existing review for each item if backend provides order items
+          if (data?.orderItems && data.orderItems.length > 0) {
+            const reviewMap = {};
+            for (const item of data.orderItems) {
+              const oid = item.orderItemId || item.OrderItemId || item.id;
+              try {
+                const res = await customerService.getOrderItemReview(oid);
+                if (res) reviewMap[oid] = res;
+              } catch {
+                // No existing review found for item
+              }
+            }
+            if (isMounted) setExistingReviewsMap(reviewMap);
+          }
+        } else {
+          if (isMounted) setError('No valid order reference found.');
+        }
+      } catch (err) {
+        console.warn('Failed to fetch order details:', err);
+        if (isMounted) setError('Could not retrieve order details.');
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    fetchOrder();
+    return () => {
+      isMounted = false;
+    };
   }, [orderId]);
 
   const toggleReviewForm = (oid, existingReview) => {
