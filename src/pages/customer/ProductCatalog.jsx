@@ -1,16 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
-import CustomerNavbar from '../../components/customer/CustomerNavbar';
-import ProductCard from '../../components/customer/ProductCard';
-import ProductFilter from '../../components/customer/ProductFilter';
-import { useCart } from '../../context/CartContext';
-import { productService } from '../../services/productService';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import ProductCard from '../../components/common/ProductCard';
+import ProductFilter from '../../components/common/ProductFilter';
+import productService from '../../services/productService';
 import gsap from 'gsap';
 
-export default function ProductCatalog() {
-  const { totalItemsCount } = useCart();
-  
+const ITEMS_PER_PAGE = 8;
+
+export const ProductCatalog = () => {
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -19,185 +16,274 @@ export default function ProductCatalog() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [maxPrice, setMaxPrice] = useState(1000);
   const [sortBy, setSortBy] = useState('featured');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
   const gridRef = useRef(null);
 
-  // Load Products & Categories from API
+  // Load Products from API
   useEffect(() => {
-    const fetchData = async () => {
+    let isMounted = true;
+    const fetchProducts = async () => {
       try {
         setLoading(true);
         setError(null);
-
-        const [productsData, categoriesData] = await Promise.allSettled([
-          productService.getAllProducts(),
-          ['vegetables', 'fruits', 'grains', 'organic produce']
-        ]);
-
-        if (productsData.status === 'fulfilled') {
-          setProducts(productsData.value || []);
-        } else {
-          console.warn('Failed to fetch products from backend, using fallback data if needed.');
-        }
-
-        if (categoriesData.status === 'fulfilled') {
-          setCategories(categoriesData.value || []);
+        const data = await productService.getAllProducts();
+        if (isMounted) {
+          setProducts(Array.isArray(data) ? data : []);
         }
       } catch (err) {
-        setError('Failed to connect to backend server. Please make sure Java Spring Boot is running.');
+        console.error('Failed to fetch product catalog:', err);
+        if (isMounted) setError('Could not load products. Please check if the server is running.');
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
-    fetchData();
+    fetchProducts();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  // Filter & Sort logic computed in-memory
-  const filteredProducts = React.useMemo(() => {
+  // Compute dynamic categories based on actual available database products
+  const categories = useMemo(() => {
+    const unique = [...new Set(products.map((p) => p.category).filter(Boolean))];
+    return unique.length > 0 ? unique : ['Vegetables', 'Fruits', 'Grains', 'Organic Produce'];
+  }, [products]);
+
+  // In-memory Filter & Sort Logic
+  const filteredProducts = useMemo(() => {
     return products
       .filter((product) => {
+        const prodName = product.productName || product.name || '';
+        const prodDesc = product.description || '';
+        const farmer = product.farmerName || '';
+
         const matchesSearch =
-          product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          product.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          product.farmerName?.toLowerCase().includes(searchTerm.toLowerCase());
+          !searchTerm ||
+          prodName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          prodDesc.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          farmer.toLowerCase().includes(searchTerm.toLowerCase());
 
         const matchesCategory =
           !selectedCategory ||
-          product.category?.toLowerCase() === selectedCategory.toLowerCase();
+          (product.category && product.category.toLowerCase() === selectedCategory.toLowerCase());
 
-        const matchesPrice = product.price <= maxPrice;
+        const matchesPrice = Number(product.price || 0) <= maxPrice;
 
         return matchesSearch && matchesCategory && matchesPrice;
       })
       .sort((a, b) => {
-        if (sortBy === 'price-low-high') return a.price - b.price;
-        if (sortBy === 'price-high-low') return b.price - a.price;
-        if (sortBy === 'name-asc') return a.name.localeCompare(b.name);
+        const priceA = Number(a.price || 0);
+        const priceB = Number(b.price || 0);
+        const nameA = a.productName || a.name || '';
+        const nameB = b.productName || b.name || '';
+
+        if (sortBy === 'price-low-high') return priceA - priceB;
+        if (sortBy === 'price-high-low') return priceB - priceA;
+        if (sortBy === 'name-asc') return nameA.localeCompare(nameB);
         return 0; // 'featured' keeps original backend order
       });
   }, [products, searchTerm, selectedCategory, maxPrice, sortBy]);
 
-  // GSAP Stagger animation when filtered products change
+  // Reset to first page when filters change
   useEffect(() => {
-    if (!loading && gridRef.current) {
-      const cards = gridRef.current.querySelectorAll('.product-card-item');
-      if (cards.length > 0) {
+    setCurrentPage(1);
+  }, [searchTerm, selectedCategory, maxPrice, sortBy]);
+
+  // Pagination slicing
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredProducts, currentPage]);
+
+  // GSAP animation when filtered/paginated products change
+  useEffect(() => {
+    const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (isReduced || loading || !gridRef.current) return;
+
+    const cards = gridRef.current.querySelectorAll('.kc-catalog-item');
+    if (cards.length > 0) {
+      const ctx = gsap.context(() => {
         gsap.fromTo(
           cards,
-          { opacity: 0, y: 30, scale: 0.96 },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.4,
-            stagger: 0.05,
-            ease: 'power2.out',
-            overwrite: 'auto'
-          }
+          { opacity: 0, y: 25 },
+          { opacity: 1, y: 0, duration: 0.4, stagger: 0.05, ease: 'power2.out' }
         );
-      }
+      }, gridRef);
+
+      return () => ctx.revert();
     }
-  }, [filteredProducts, loading]);
+  }, [paginatedProducts, loading]);
 
   const handleResetFilters = () => {
     setSearchTerm('');
     setSelectedCategory('');
     setMaxPrice(1000);
     setSortBy('featured');
+    setCurrentPage(1);
   };
 
   return (
-    <div className="min-vh-100 d-flex flex-column" style={{ background: 'linear-gradient(135deg, #f6f9fc 0%, #eef4f1 100%)' }}>
-      <CustomerNavbar cartCount={totalItemsCount} />
+    <div className="kc-container py-4">
+      {/* Page Header */}
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+          <span className="kc-section-badge mb-1">
+            <i className="bi bi-shop"></i> Farm-to-Table
+          </span>
+          <h2 className="fw-extrabold text-dark mb-1">Organic Produce Catalog</h2>
+          <p className="text-muted small mb-0">
+            Showing {filteredProducts.length} certified fresh harvests directly from verified growers.
+          </p>
+        </div>
 
-      {/* Main Container with top and bottom spacing for mobile bottom dock */}
-      <main className="container py-4 mb-5 flex-grow-1" style={{ marginTop: '80px' }}>
-        
-        {/* Glassmorphic Banner Section */}
-        <div className="glass-banner p-4 p-lg-5 mb-4 rounded-4 text-white shadow-sm position-relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #12372A 0%, #1B4D3E 100%)' }}>
-          <div className="row align-items-center position-relative z-1">
-            <div className="col-lg-8">
-              <span className="badge bg-success bg-opacity-25 text-success-light px-3 py-1 rounded-pill mb-2 fw-semibold fs-8 border border-success border-opacity-25">
-                <i className="bi bi-patch-check-fill me-1"></i> Direct From Farms
-              </span>
-              <h2 className="fw-extrabold mb-2 text-white">Fresh Harvest, Directly from Local Farmers</h2>
-              <p className="mb-0 text-light opacity-85 fs-6 lh-base">
-                Support your community agriculture. Choose from pesticide-free vegetables, seasonal fruits, grains, and organic produce.
+        {/* Mobile Filter Toggle Button */}
+        <button
+          type="button"
+          className="kc-btn kc-btn-outline kc-btn-sm d-lg-none align-self-start"
+          onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
+        >
+          <i className="bi bi-funnel"></i>
+          <span>{mobileFilterOpen ? 'Hide Filters' : 'Filter Products'}</span>
+        </button>
+      </div>
+
+      <div className="row g-4">
+        {/* Left Column: Filter Sidebar */}
+        <div className={`col-lg-3 ${mobileFilterOpen ? 'd-block' : 'd-none d-lg-block'}`}>
+          <ProductFilter
+            categories={categories}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            maxPrice={maxPrice}
+            setMaxPrice={setMaxPrice}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            onResetFilters={handleResetFilters}
+          />
+        </div>
+
+        {/* Right Column: Products Grid */}
+        <div className="col-lg-9">
+          {/* Active Filter Chips */}
+          {(searchTerm || selectedCategory) && (
+            <div className="d-flex flex-wrap gap-2 align-items-center mb-3">
+              <span className="small text-muted me-1">Active Filters:</span>
+              {selectedCategory && (
+                <span className="kc-badge kc-badge-organic d-inline-flex align-items-center gap-1">
+                  Category: {selectedCategory}
+                  <i
+                    className="bi bi-x-circle cursor-pointer ms-1"
+                    onClick={() => setSelectedCategory('')}
+                    style={{ cursor: 'pointer' }}
+                  ></i>
+                </span>
+              )}
+              {searchTerm && (
+                <span className="kc-badge kc-badge-forest d-inline-flex align-items-center gap-1">
+                  Query: "{searchTerm}"
+                  <i
+                    className="bi bi-x-circle cursor-pointer ms-1"
+                    onClick={() => setSearchTerm('')}
+                    style={{ cursor: 'pointer' }}
+                  ></i>
+                </span>
+              )}
+              <button
+                onClick={handleResetFilters}
+                className="btn btn-link btn-sm text-muted p-0 ms-2 text-decoration-none small"
+              >
+                Clear All
+              </button>
+            </div>
+          )}
+
+          {/* Catalog Grid */}
+          {loading ? (
+            <div className="row g-4">
+              {[1, 2, 3, 4, 5, 6].map((n) => (
+                <div key={n} className="col-6 col-md-4">
+                  <div className="kc-card p-3 placeholder-glow" style={{ height: '340px' }}>
+                    <div className="placeholder w-100 rounded-3 mb-3" style={{ height: '180px' }}></div>
+                    <div className="placeholder col-8 mb-2"></div>
+                    <div className="placeholder col-4"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : error ? (
+            <div className="kc-card p-5 text-center">
+              <i className="bi bi-exclamation-triangle text-danger display-5 d-block mb-3"></i>
+              <h5 className="fw-bold text-dark">{error}</h5>
+              <button onClick={() => window.location.reload()} className="kc-btn kc-btn-outline kc-btn-sm mt-3">
+                Reload Catalog
+              </button>
+            </div>
+          ) : paginatedProducts.length > 0 ? (
+            <div className="row g-4" ref={gridRef}>
+              {paginatedProducts.map((prod) => (
+                <div key={prod.productId || prod.id} className="col-6 col-md-4 kc-catalog-item">
+                  <ProductCard product={prod} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="kc-card p-5 text-center">
+              <i className="bi bi-search text-muted display-4 d-block mb-3 opacity-50"></i>
+              <h5 className="fw-bold text-dark">No Matching Produce Found</h5>
+              <p className="text-muted small">
+                We couldn't find any produce matching your current filter settings.
               </p>
+              <button onClick={handleResetFilters} className="kc-btn kc-btn-primary kc-btn-sm d-inline-flex mt-2">
+                Reset All Filters
+              </button>
             </div>
-            <div className="col-lg-4 text-lg-end mt-3 mt-lg-0 d-none d-lg-block">
-              <div className="display-3 text-success opacity-75">
-                <i className="bi bi-basket3"></i>
-              </div>
+          )}
+
+          {/* ========================================================
+              PAGINATION
+              ======================================================== */}
+          {totalPages > 1 && (
+            <div className="d-flex justify-content-center align-items-center gap-2 mt-5">
+              <button
+                className="kc-btn kc-btn-cream kc-btn-sm"
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                <i className="bi bi-chevron-left"></i> Prev
+              </button>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((pg) => (
+                <button
+                  key={pg}
+                  className={`kc-btn kc-btn-sm ${
+                    currentPage === pg ? 'kc-btn-primary' : 'kc-btn-cream'
+                  }`}
+                  style={{ minWidth: '38px', padding: '0.45rem 0.75rem' }}
+                  onClick={() => setCurrentPage(pg)}
+                >
+                  {pg}
+                </button>
+              ))}
+
+              <button
+                className="kc-btn kc-btn-cream kc-btn-sm"
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+              >
+                Next <i className="bi bi-chevron-right"></i>
+              </button>
             </div>
-          </div>
+          )}
         </div>
-
-        {/* Main Content Layout */}
-        <div className="row g-4">
-          {/* Left Sidebar Filter */}
-          <div className="col-lg-3 col-md-4">
-            <ProductFilter
-              categories={categories}
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-              maxPrice={maxPrice}
-              setMaxPrice={setMaxPrice}
-              sortBy={sortBy}
-              setSortBy={setSortBy}
-              onResetFilters={handleResetFilters}
-            />
-          </div>
-
-          {/* Right Product Grid */}
-          <div className="col-lg-9 col-md-8">
-            {loading ? (
-              <div className="text-center py-5 glass-panel rounded-4">
-                <div className="spinner-border text-success" role="status" style={{ width: '3rem', height: '3rem' }}>
-                  <span className="visually-hidden">Loading products...</span>
-                </div>
-                <p className="mt-3 text-muted fw-medium">Loading fresh produce for you...</p>
-              </div>
-            ) : error ? (
-              <div className="alert alert-danger border-0 shadow-sm rounded-4 text-center my-4 py-4 bg-danger bg-opacity-15 text-danger fw-semibold" role="alert">
-                <i className="bi bi-exclamation-triangle-fill fs-3 d-block mb-2"></i>
-                {error}
-              </div>
-            ) : filteredProducts.length === 0 ? (
-              <div className="glass-panel card border-0 shadow-sm text-center py-5 rounded-4">
-                <div className="card-body py-5">
-                  <i className="bi bi-search text-success display-4 d-block mb-3 opacity-50"></i>
-                  <h5 className="fw-bold text-dark">No products found</h5>
-                  <p className="text-muted small mb-3">Try adjusting your filter search criteria or price range.</p>
-                  <button onClick={handleResetFilters} className="btn btn-success btn-sm rounded-pill px-4 fw-bold shadow-hover">
-                    Clear All Filters
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div>
-                <div className="d-flex justify-content-between align-items-center mb-3 px-1">
-                  <span className="text-muted fs-7 fw-semibold">
-                    Showing <strong className="text-dark">{filteredProducts.length}</strong> available products
-                  </span>
-                </div>
-
-                {/* Animated Product Grid */}
-                <div ref={gridRef} className="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
-                  {filteredProducts.map((product) => (
-                    <div key={product.id || product.productId} className="col product-card-item">
-                      <ProductCard product={product} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </main>
+      </div>
     </div>
   );
-}
+};
+
+export default ProductCatalog;

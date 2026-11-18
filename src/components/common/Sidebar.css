@@ -1,0 +1,113 @@
+/* KisanConnect Farmer Dashboard Sidebar */
+
+.kc-sidebar-wrapper {
+  width: 260px;
+  min-height: 100vh;
+  background-color: var(--kc-forest-green);
+  color: var(--kc-cream);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 1020;
+  padding: 1.5rem 1rem;
+  box-shadow: 4px 0 24px rgba(22, 61, 43, 0.15);
+  transition: transform var(--kc-transition-normal);
+}
+
+.kc-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.5rem 0.75rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+  color: var(--kc-white) !important;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.kc-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1.5rem 0;
+  flex-grow: 1;
+}
+
+.kc-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 1rem;
+  border-radius: var(--kc-radius-md);
+  color: var(--kc-beige) !important;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: all var(--kc-transition-fast);
+}
+
+.kc-sidebar-link i {
+  font-size: 1.2rem;
+  color: var(--kc-fresh-green);
+  transition: transform var(--kc-transition-fast);
+}
+
+.kc-sidebar-link:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--kc-white) !important;
+  transform: translateX(4px);
+}
+
+.kc-sidebar-link:hover i {
+  color: var(--kc-white);
+}
+
+.kc-sidebar-link.active {
+  background-color: var(--kc-fresh-green);
+  color: var(--kc-white) !important;
+  box-shadow: 0 4px 14px rgba(79, 138, 85, 0.35);
+}
+
+.kc-sidebar-link.active i {
+  color: var(--kc-white);
+}
+
+.kc-sidebar-footer {
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.kc-sidebar-user-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border-radius: var(--kc-radius-md);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Mobile Sidebar Offcanvas backdrop */
+.kc-sidebar-mobile-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+}
+
+@media (max-width: 991.98px) {
+  .kc-sidebar-wrapper {
+    transform: translateX(-100%);
+    z-index: 1050;
+  }
+
+  .kc-sidebar-wrapper.mobile-open {
+    transform: translateX(0);
+  }
+}

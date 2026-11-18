@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://kisanconnect-backend-latest.onrender.com';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -13,7 +13,7 @@ let isRefreshing = false;
 let failedQueue = [];
 
 const processQueue = (error, token = null) => {
-  failedQueue.forEach(prom => {
+  failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
     } else {
@@ -26,7 +26,7 @@ const processQueue = (error, token = null) => {
 // 1. Request Interceptor: Attach access token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('Authorization');
+    const token = localStorage.getItem('Authorization') || localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -40,24 +40,19 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-
-     // Check for 401 (Unauthorized) or 403 (Forbidden due to expired/invalid token)
     const status = error.response ? error.response.status : null;
 
     if ((status === 401 || status === 403) && !originalRequest._retry) {
-      
       // If a refresh is already in progress, queue this request
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
-          .then(token => {
+          .then((token) => {
             originalRequest.headers.Authorization = `Bearer ${token}`;
             return api(originalRequest);
           })
-          .catch(err => {
-            return Promise.reject(err);
-          });
+          .catch((err) => Promise.reject(err));
       }
 
       originalRequest._retry = true;
@@ -67,45 +62,39 @@ api.interceptors.response.use(
         const refreshToken = localStorage.getItem('refreshToken');
 
         if (!refreshToken) {
-          console.log("No refresh token found")
-          throw new Error("No refresh token found");
+          throw new Error('No refresh token found');
         }
-
-        console.log("Token expired/unauthorized (status " + status + "). Requesting new access token...");
 
         // Call backend refresh route
         const response = await axios.post(`${API_BASE_URL}/public/user/auth/refresh`, {
-          refreshToken: refreshToken
+          refreshToken: refreshToken,
         });
 
         const newAccessToken = response.data.token;
         localStorage.setItem('Authorization', newAccessToken);
+        localStorage.setItem('token', newAccessToken);
 
         if (response.data.refreshToken) {
           localStorage.setItem('refreshToken', response.data.refreshToken);
         }
 
-        console.log("Token refreshed successfully!"+newAccessToken);
-
-        // Process all queued requests with the new token
         processQueue(null, newAccessToken);
         isRefreshing = false;
 
-        // Retry the original failed request
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(originalRequest);
-
       } catch (refreshError) {
-        console.error("Token refresh failed:", refreshError);
-        
-        // If refresh fails, reject queue and force logout
         processQueue(refreshError, null);
         isRefreshing = false;
 
         localStorage.removeItem('Authorization');
+        localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('role');
-        window.location.href = '/login';
+
+        if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
+          window.location.href = '/login';
+        }
         return Promise.reject(refreshError);
       }
     }
@@ -114,4 +103,5 @@ api.interceptors.response.use(
   }
 );
 
+export { api };
 export default api;

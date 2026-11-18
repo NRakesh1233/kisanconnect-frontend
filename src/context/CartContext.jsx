@@ -1,30 +1,48 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import api from '../services/api';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import customerService from '../services/customerService';
 
-const CartContext = createContext();
+export const CartContext = createContext(null);
 
-export const useCart = () => {
-  const context = useContext(CartContext);
-  if (!context) {
-    throw new Error('useCart must be used within a CartProvider');
-  }
-  return context;
-};
+const CART_STORAGE_KEY = 'kisanconnect_cart';
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState(() => {
+    try {
+      const saved = localStorage.getItem(CART_STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [loading, setLoading] = useState(true);
 
+  // Sync cart items to localStorage for persistence
+  useEffect(() => {
+    try {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
+    } catch (err) {
+      console.warn('Failed to sync kisanconnect_cart to localStorage:', err);
+    }
+  }, [cartItems]);
+
   // Fetch cart items from database
-  const fetchCart = async () => {
+  const fetchCart = useCallback(async () => {
+    const token = localStorage.getItem('Authorization') || localStorage.getItem('token');
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
-      const response = await api.get('customer/cart/products');
-      const mappedItems = (response.data || []).map((item) => ({
+      const data = await customerService.getCartProducts();
+      const mappedItems = (data || []).map((item) => ({
         id: item.productId,
+        productId: item.productId,
         cartId: item.cartId,
         name: item.productName,
-        price: Number(item.productPrice) || 0,
+        productName: item.productName,
+        price: Number(item.productPrice) || Number(item.price) || 0,
         quantity: Number(item.quantity) || 1,
         totalPrice: Number(item.totalPrice) || 0,
         image: item.image || item.productImage,
@@ -34,107 +52,118 @@ export const CartProvider = ({ children }) => {
         availableStock: Number(item.availableStock) || 999,
         farmerId: item.farmerId,
         farmerName: item.farmerName,
-        farmerProfilePic: item.farmerProfilePic
+        farmerProfilePic: item.farmerProfilePic,
       }));
       setCartItems(mappedItems);
     } catch (err) {
-      console.warn('Could not fetch database cart (user may need to login):', err);
-      setCartItems([]);
+      console.warn('Could not fetch cart items (user may need to login):', err);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchCart();
-  }, []);
+  }, [fetchCart]);
 
+  // Add item to cart
   const addToCart = async (product, quantity = 1) => {
     try {
+      const prodPrice = Number(product.price) || Number(product.productPrice) || 0;
+      const qty = Number(quantity) || 1;
+
       const payload = {
         productId: product.productId || product.id,
-        cartPrice: Number(product.price) || 0,
-        quantity: Number(quantity) || 1,
-        totalPrice: (Number(product.price) || 0) * (Number(quantity) || 1)
+        cartPrice: prodPrice,
+        quantity: qty,
+        totalPrice: prodPrice * qty,
       };
 
-      const response = await api.post('customer/cart/add', payload);
-      const msg = response.data;
-      
-      // Automatically refresh cart state
+      const response = await customerService.addToCart(payload);
       await fetchCart();
-      
-      return `${product.productName || product.name} ${msg}!`;
+      return `${product.productName || product.name || 'Item'} ${response || 'added to cart'}!`;
     } catch (err) {
       console.error('Failed to add item to database cart:', err);
-      alert('Failed to update cart on server.');
+      throw err;
     }
   };
 
+  // Update item quantity in cart
   const updateQuantity = async (cartId, newQuantity) => {
     try {
-      const product1 = cartItems.find(item => item.cartId === cartId);
-      if (!product1) return;
+      const targetItem = cartItems.find((item) => item.cartId === cartId);
+      if (!targetItem) return;
 
-      // If quantity is reduced to 0 or less, remove the item entirely from the cart
       if (newQuantity <= 0) {
         await removeFromCart(cartId);
         return;
       }
 
-      await api.put(`customer/cart/update/quantity/${cartId}`, {
-        productId: Number(product1.id) || 0,
-        cartPrice: Number(product1.price) || 0,
+      await customerService.updateCartQuantity(cartId, {
+        productId: Number(targetItem.id || targetItem.productId) || 0,
+        cartPrice: Number(targetItem.price) || 0,
         quantity: Number(newQuantity),
-        totalPrice: (Number(product1.price) || 0) * (Number(newQuantity) || 1)
+        totalPrice: (Number(targetItem.price) || 0) * Number(newQuantity),
       });
 
-      // Automatically refresh cart state
       await fetchCart();
     } catch (err) {
       console.error('Failed to update quantity in database:', err);
+      throw err;
     }
   };
 
+  // Remove item from cart
   const removeFromCart = async (cartId) => {
     try {
-      const response = await api.delete(`customer/cart/delete/${cartId}`);
-      const msg = response.data;
-      
-      // Automatically refresh cart state
+      const response = await customerService.removeFromCart(cartId);
       await fetchCart();
-      return msg;
+      return response;
     } catch (err) {
       console.error('Failed to remove item from database:', err);
+      throw err;
     }
   };
 
+  // Clear entire cart
   const clearCart = async () => {
     try {
-      await api.delete('customer/cart/delete/all');
+      await customerService.clearCart();
       setCartItems([]);
+      localStorage.removeItem(CART_STORAGE_KEY);
     } catch (err) {
       console.error('Failed to clear database cart:', err);
+      throw err;
     }
   };
 
   const totalItemsCount = cartItems.reduce((acc, item) => acc + (Number(item.quantity) || 0), 0);
-  const cartSubtotal = cartItems.reduce((acc, item) => acc + (Number(item.price) || 0) * (Number(item.quantity) || 0), 0);
-
-  return (
-    <CartContext.Provider
-      value={{
-        cartItems,
-        addToCart,
-        updateQuantity,
-        removeFromCart,
-        clearCart,
-        totalItemsCount,
-        cartSubtotal,
-        fetchCart
-      }}
-    >
-      {children}
-    </CartContext.Provider>
+  const cartSubtotal = cartItems.reduce(
+    (acc, item) => acc + (Number(item.price) || 0) * (Number(item.quantity) || 0),
+    0
   );
+
+  const value = {
+    cartItems,
+    addToCart,
+    updateQuantity,
+    removeFromCart,
+    clearCart,
+    totalItemsCount,
+    cartSubtotal,
+    fetchCart,
+    loading,
+  };
+
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };
+
+export const useCart = () => {
+  const context = useContext(CartContext);
+  if (!context) {
+    throw new Error('useCart must be used within a CartProvider');
+  }
+  return context;
+};
+
+export default CartContext;

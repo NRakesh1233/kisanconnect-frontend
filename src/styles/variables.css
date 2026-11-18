@@ -1,0 +1,89 @@
+/* KisanConnect Design System - Color Tokens & CSS Variables
+   Inspired by Organic Food - Farm Website UI Kit Figma Reference */
+
+:root {
+  /* ========================================================
+     1. COLOR PALETTE (Figma Reference Alignment)
+     ======================================================== */
+  /* Primary Forest Green: Rich, authoritative nature */
+  --kc-forest-green: #163D2B;
+  --kc-forest-green-rgb: 22, 61, 43;
+  --kc-forest-green-hover: #102F21;
+  --kc-forest-green-dark: #0B2217;
+
+  /* Fresh Green: Vibrant, organic, harvest accent */
+  --kc-fresh-green: #4F8A55;
+  --kc-fresh-green-rgb: 79, 138, 85;
+  --kc-fresh-green-hover: #437648;
+  --kc-fresh-green-light: #EBF4ED;
+  --kc-fresh-green-subtle: rgba(79, 138, 85, 0.12);
+
+  /* Cream: Authentic warm, organic background replacing stark white */
+  --kc-cream: #F8F6EF;
+  --kc-cream-rgb: 248, 246, 239;
+  --kc-cream-light: #FCFBF7;
+
+  /* Beige: Warm divider lines, chips, and subtle containers */
+  --kc-beige: #EAE5D8;
+  --kc-beige-rgb: 234, 229, 216;
+  --kc-beige-hover: #DFD8C7;
+
+  /* Pure White: High-contrast card surfaces, inputs, modal containers */
+  --kc-white: #FFFFFF;
+  --kc-white-rgb: 255, 255, 255;
+
+  /* Semantic Accent Accents */
+  --kc-amber-gold: #D9822B;
+  --kc-amber-gold-subtle: #FDF4EB;
+  --kc-crimson-red: #C53929;
+  --kc-crimson-red-subtle: #FDF0EE;
+  --kc-sky-blue: #2A6F97;
+  --kc-sky-blue-subtle: #E8F4F8;
+
+  /* Text & Neutral Hierarchy */
+  --kc-text-primary: #163D2B;
+  --kc-text-body: #2D3E35;
+  --kc-text-muted: #64746A;
+  --kc-text-light: #94A39A;
+  --kc-text-inverse: #FFFFFF;
+
+  /* Border Tokens */
+  --kc-border-subtle: rgba(22, 61, 43, 0.08);
+  --kc-border-medium: rgba(22, 61, 43, 0.16);
+  --kc-border-beige: #EAE5D8;
+  --kc-border-green: rgba(79, 138, 85, 0.3);
+
+  /* ========================================================
+     2. TYPOGRAPHY
+     ======================================================== */
+  --kc-font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --kc-font-serif: 'Playfair Display', Georgia, Cambria, 'Times New Roman', serif;
+
+  /* ========================================================
+     3. ELEVATION & SHADOWS
+     ======================================================== */
+  --kc-shadow-xs: 0 1px 3px rgba(22, 61, 43, 0.04);
+  --kc-shadow-sm: 0 2px 8px rgba(22, 61, 43, 0.06);
+  --kc-shadow-md: 0 6px 18px rgba(22, 61, 43, 0.08);
+  --kc-shadow-lg: 0 12px 32px rgba(22, 61, 43, 0.10);
+  --kc-shadow-xl: 0 20px 48px rgba(22, 61, 43, 0.14);
+  --kc-shadow-fresh: 0 8px 24px rgba(79, 138, 85, 0.22);
+  --kc-shadow-inner: inset 0 2px 4px rgba(22, 61, 43, 0.04);
+
+  /* ========================================================
+     4. RADII (Organic & Rounded)
+     ======================================================== */
+  --kc-radius-xs: 6px;
+  --kc-radius-sm: 10px;
+  --kc-radius-md: 16px;
+  --kc-radius-lg: 24px;
+  --kc-radius-xl: 32px;
+  --kc-radius-full: 9999px;
+
+  /* ========================================================
+     5. TRANSITIONS
+     ======================================================== */
+  --kc-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --kc-transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --kc-transition-smooth: 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}

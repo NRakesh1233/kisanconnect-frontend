@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import CustomerNavbar from '../../components/customer/CustomerNavbar';
-import CustomerFooter from '../../components/customer/CustomerFooter';
-import ProductCard from '../../components/customer/ProductCard';
-import { useCart } from '../../context/CartContext';
-import { productService } from '../../services/productService';
-import 'bootstrap-icons/font/bootstrap-icons.css';
+import ProductCard from '../../components/common/ProductCard';
+import { useCart } from '../../hooks/useCart';
+import productService from '../../services/productService';
+import { formatCurrency, resolveProductImageUrl } from '../../utils/formatters';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
-export default function Cart() {
+export const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart, clearCart, totalItemsCount, cartSubtotal } = useCart();
   const navigate = useNavigate();
 
@@ -26,16 +22,17 @@ export default function Cart() {
   // Set warning banner if multiple farmers detected
   useEffect(() => {
     if (hasMultipleFarmers) {
-      setWarningMsg('⚠️ Your cart contains products from different farmers. Please checkout or clear items from one farmer before adding products from another farmer.');
+      setWarningMsg(
+        '⚠️ Your cart contains produce from different farmers. In order to optimize dispatch logistics, please checkout or clear items from one farmer before adding items from another.'
+      );
     } else {
       setWarningMsg('');
     }
   }, [hasMultipleFarmers, cartItems]);
 
-  // Fetch other products from the same farmer present in the cart (guarded against undefined)
+  // Fetch other products from the same farmer present in the cart
   useEffect(() => {
     let isMounted = true;
-
     const fetchMoreFromFarmer = async () => {
       const farmerId = uniqueFarmerIds[0];
       if (!cartItems || cartItems.length === 0 || uniqueFarmerIds.length !== 1 || !farmerId) {
@@ -44,12 +41,11 @@ export default function Cart() {
       }
 
       try {
-        const allFarmerProducts = await productService.getProductsByFarmer(farmerId).catch(() => []);
-             console.log('Fetched products from farmer:', allFarmerProducts);
+        const allFarmerProducts = await productService.getProductsByFarmer(farmerId);
         if (!isMounted) return;
 
         // Filter out items already in the cart
-        const cartProductIds = new Set(cartItems.map((item) => item.id));
+        const cartProductIds = new Set(cartItems.map((item) => item.productId || item.id));
         const filteredSuggestions = (allFarmerProducts || []).filter(
           (prod) => !cartProductIds.has(prod.productId || prod.id)
         );
@@ -62,197 +58,224 @@ export default function Cart() {
     };
 
     fetchMoreFromFarmer();
-
     return () => {
       isMounted = false;
     };
   }, [cartItems]);
 
-  // Helper to safely format image source
-  const getProductImageSrc = (item) => {
-    const imgProp = item.imageUrl || item.image;
-    return imgProp;
-  };
-console.log('Farmer products:', farmerProducts);
-console.log('farmer ids:', uniqueFarmerIds);
   return (
-    <div className="min-vh-100 bg-light d-flex flex-column">
-      <CustomerNavbar cartCount={totalItemsCount} />
+    <div className="kc-container py-4">
+      {/* Header */}
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <span className="kc-section-badge mb-1">
+            <i className="bi bi-basket"></i> Your Basket
+          </span>
+          <h2 className="fw-extrabold text-dark mb-0">Shopping Cart</h2>
+        </div>
 
-      <main className="container py-5 flex-grow-1" style={{marginTop:"100px"}}>
-        <h2 className="fw-bold text-dark mb-4">
-          <i className="bi bi-cart3 text-success me-2"></i>Shopping Cart
-        </h2>
-
-        {/* Multi-Farmer Warning Alert */}
-        {warningMsg && (
-          <div className="alert alert-warning shadow-sm border-warning mb-4 d-flex align-items-center justify-content-between" role="alert">
-            <div><i className="bi bi-exclamation-triangle-fill me-2"></i>{warningMsg}</div>
-            <button onClick={clearCart} className="btn btn-sm btn-outline-dark fw-bold text-nowrap ms-3">
-              Clear Cart
-            </button>
-          </div>
+        {cartItems.length > 0 && (
+          <button
+            onClick={clearCart}
+            className="btn btn-outline-danger btn-sm rounded-pill px-3 fw-semibold"
+          >
+            <i className="bi bi-trash me-1"></i> Clear Cart
+          </button>
         )}
+      </div>
 
-        {cartItems.length === 0 ? (
-          <div className="card border-0 shadow-sm text-center py-5 rounded-4 bg-white">
-            <div className="card-body py-5">
-              <i className="bi bi-cart-x text-muted display-3 d-block mb-3"></i>
-              <h4 className="fw-bold text-dark">Your cart is empty</h4>
-              <p className="text-muted mb-4">Explore our fresh agricultural catalog and add some farm-fresh produce!</p>
-              <Link to="/customer/products" className="btn btn-success px-4 py-2">
-                Browse Products
-              </Link>
-            </div>
+      {/* Multi-Farmer Warning Alert */}
+      {warningMsg && (
+        <div
+          className="alert border-0 shadow-sm p-3.5 rounded-4 mb-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3"
+          role="alert"
+          style={{ backgroundColor: 'var(--kc-amber-gold-subtle)', color: 'var(--kc-amber-gold)' }}
+        >
+          <div className="d-flex align-items-center gap-2">
+            <i className="bi bi-exclamation-triangle-fill fs-5 flex-shrink-0"></i>
+            <span className="small fw-semibold">{warningMsg}</span>
           </div>
-        ) : (
-          <div>
-            <div className="row g-4 mb-5">
-              {/* Cart Items List */}
-              <div className="col-lg-8">
-                <div className="card border-0 shadow-sm rounded-4 p-3 bg-white">
-                  <div className="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                    <h5 className="fw-bold text-dark mb-0">Cart Items ({totalItemsCount})</h5>
-                    <button onClick={clearCart} className="btn btn-outline-danger btn-sm">
-                      <i className="bi bi-trash me-1"></i> Clear Cart
-                    </button>
-                  </div>
+          <button
+            onClick={clearCart}
+            className="kc-btn kc-btn-sm kc-btn-outline align-self-start align-self-md-auto text-nowrap"
+          >
+            Clear Other Items
+          </button>
+        </div>
+      )}
 
-                  <div className="d-flex flex-column gap-3">
-                    {cartItems.map((item) => {
-                      const currentQty = Number(item.quantity) || 1;
-                      const currentPrice = Number(item.price) || 0;
-                      const itemTotal = currentPrice * currentQty;
+      {cartItems.length === 0 ? (
+        <div className="kc-card p-5 text-center shadow-sm my-4">
+          <i className="bi bi-cart-x text-muted display-3 d-block mb-3 opacity-50"></i>
+          <h4 className="fw-bold text-dark mb-2">Your Cart is Currently Empty</h4>
+          <p className="text-muted small mb-4">
+            Discover crisp, nutrient-dense organic harvests direct from local farm stewards.
+          </p>
+          <Link to="/customer/products" className="kc-btn kc-btn-primary kc-btn-sm d-inline-flex">
+            Browse Fresh Harvests
+          </Link>
+        </div>
+      ) : (
+        <div className="row g-4 mb-5">
+          {/* Cart Items List */}
+          <div className="col-lg-8">
+            <div className="kc-card p-3 p-md-4 shadow-sm">
+              <div className="d-flex flex-column gap-3">
+                {cartItems.map((item) => {
+                  const itemId = item.cartId || item.productId || item.id;
+                  const itemImg = resolveProductImageUrl(item.image || item.imageUrl || item.productImage);
+                  const price = Number(item.price) || 0;
+                  const qty = Number(item.quantity) || 1;
+                  const lineTotal = price * qty;
 
-                      return (
-                        <div key={item.cartId || item.id} className="p-3 rounded-3 border bg-light d-flex align-items-center gap-3 flex-wrap flex-sm-nowrap">
-                          {/* Product Image */}
-                          <img
-                            src={getProductImageSrc(item)}
-                            alt={item.name}
-                            className="rounded-3 object-fit-cover"
-                            style={{ width: '80px', height: '80px' }}
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = 'https://via.placeholder.com/80?text=Produce';
-                            }}
-                          />
-
-                          {/* Product Details */}
-                          <div className="flex-grow-1">
-                            <h6 className="fw-bold text-dark mb-1">{item.name}</h6>
-                            <small className="text-muted d-block mb-1">
-                              Farmer: <span className="text-dark fw-medium">{item.farmerName || 'Local Farmer'}</span>
-                            </small>
-                            <span className="fw-bold text-success">₹{currentPrice} / {item.unit || 'kg'}</span>
+                  return (
+                    <div
+                      key={itemId}
+                      className="p-3 rounded-4 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 border"
+                      style={{ backgroundColor: 'var(--kc-cream)', borderColor: 'var(--kc-beige)' }}
+                    >
+                      {/* Image & Title */}
+                      <div className="d-flex align-items-center gap-3">
+                        <img
+                          src={itemImg}
+                          alt={item.name}
+                          className="rounded-3 object-fit-cover shadow-xs flex-shrink-0"
+                          style={{ width: '70px', height: '70px', border: '1px solid var(--kc-beige)' }}
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&q=80&w=300';
+                          }}
+                        />
+                        <div>
+                          <h6 className="fw-bold text-dark mb-1">{item.name || 'Produce Item'}</h6>
+                          <div className="d-flex align-items-center gap-2 small text-muted">
+                            <span>{formatCurrency(price)} / {item.unit || 'kg'}</span>
+                            {item.farmerName && (
+                              <span className="badge kc-badge-cream" style={{ fontSize: '0.7rem' }}>
+                                Grower: {item.farmerName}
+                              </span>
+                            )}
                           </div>
+                        </div>
+                      </div>
 
-                          {/* Quantity Controls */}
-                          <div className="d-flex align-items-center border rounded bg-white" style={{ width: '120px' }}>
-                            <button
-                              className="btn btn-sm btn-light text-success px-2 py-1 border-0"
-                              onClick={() => updateQuantity(item.cartId, currentQty - 1)}
-                            >
-                              <i className="bi bi-dash"></i>
-                            </button>
-                            <div className="flex-grow-1 text-center fw-bold text-dark fs-7">
-                              {currentQty}
-                            </div>
-                            <button
-                              className="btn btn-sm btn-light text-success px-2 py-1 border-0"
-                              onClick={() => updateQuantity(item.cartId, currentQty + 1)}
-                              disabled={currentQty >= (item.availableStock || 999)}
-                            >
-                              <i className="bi bi-plus"></i>
-                            </button>
-                          </div>
-
-                          {/* Item Total */}
-                          <div className="text-end" style={{ minWidth: '90px' }}>
-                            <span className="fw-bold text-dark d-block">₹{itemTotal.toFixed(2)}</span>
-                          </div>
-
-                          {/* Remove Button */}
+                      {/* Stepper, Line Total, Remove */}
+                      <div className="d-flex align-items-center justify-content-between justify-content-sm-end gap-3 ms-auto ms-sm-0">
+                        {/* Stepper */}
+                        <div
+                          className="d-flex align-items-center border rounded-pill bg-white px-2 py-1"
+                          style={{ borderColor: 'var(--kc-beige)' }}
+                        >
                           <button
-                            className="btn btn-outline-danger btn-sm border-0"
-                            onClick={() => removeFromCart(item.cartId)}
-                            title="Remove item"
+                            type="button"
+                            className="btn btn-sm btn-link text-dark p-0 px-2 text-decoration-none"
+                            onClick={() => updateQuantity(item.cartId, qty - 1)}
+                            aria-label="Decrease quantity"
                           >
-                            <i className="bi bi-trash fs-5"></i>
+                            <i className="bi bi-dash-lg"></i>
+                          </button>
+                          <span className="fw-bold px-2 small">{qty}</span>
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-link text-dark p-0 px-2 text-decoration-none"
+                            onClick={() => updateQuantity(item.cartId, qty + 1)}
+                            disabled={qty >= (item.availableStock || 99)}
+                            aria-label="Increase quantity"
+                          >
+                            <i className="bi bi-plus-lg"></i>
                           </button>
                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
 
-              {/* Cart Summary Card */}
-              <div className="col-lg-4">
-                <div className="card border-0 shadow-sm rounded-4 p-4 bg-white sticky-top" style={{ top: '90px' }}>
-                  <h5 className="fw-bold text-dark mb-3 pb-2 border-bottom">Order Summary</h5>
+                        {/* Line Total */}
+                        <div className="text-end" style={{ minWidth: '85px' }}>
+                          <span className="fw-extrabold text-dark d-block">
+                            {formatCurrency(lineTotal)}
+                          </span>
+                        </div>
 
-                  <div className="d-flex justify-content-between mb-2 fs-7">
-                    <span className="text-muted">Subtotal</span>
-                    <span className="fw-bold text-dark">₹{cartSubtotal.toFixed(2)}</span>
-                  </div>
-
-                  <div className="d-flex justify-content-between mb-3 fs-7 pb-3 border-bottom">
-                    <span className="text-muted">Delivery Charge</span>
-                    <span className="fw-bold text-success">₹{deliveryFee}</span>
-                  </div>
-
-                  <div className="d-flex justify-content-between mb-4 fs-5 fw-bold">
-                    <span className="text-dark">Grand Total</span>
-                    <span className="text-success">₹{grandTotal.toFixed(2)}</span>
-                  </div>
-
-                  <button
-                    onClick={() => {
-                      if (hasMultipleFarmers) {
-                        alert('You cannot checkout with products from multiple farmers in the same order. Please keep products from only one farmer.');
-                        return;
-                      }
-                      navigate('/customer/checkout');
-                    }}
-                    disabled={hasMultipleFarmers}
-                    className={`btn btn-lg w-100 d-flex align-items-center justify-content-center gap-2 shadow-sm ${
-                      hasMultipleFarmers ? 'btn-secondary' : 'btn-success'
-                    }`}
-                  >
-                    <span>Proceed to Checkout</span>
-                    <i className="bi bi-arrow-right"></i>
-                  </button>
-                </div>
+                        {/* Remove Action */}
+                        <button
+                          type="button"
+                          className="btn btn-link text-danger p-1 text-decoration-none"
+                          onClick={() => removeFromCart(item.cartId)}
+                          title="Remove item"
+                        >
+                          <i className="bi bi-trash fs-5"></i>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-
-            {/* More Products from the Same Farmer */}
-            {farmerProducts.length > 0 && !hasMultipleFarmers && (
-              <section className="mt-5 pt-4 border-top">
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                  <div>
-                    <h4 className="fw-bold text-dark mb-1">
-                      <i className="bi bi-shop text-success me-2"></i>More Fresh Produce from this Farmer
-                    </h4>
-                    <p className="text-muted fs-7 mb-0">Add more items from the same farmer to your current order.</p>
-                  </div>
-                </div>
-
-                <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
-                  {farmerProducts.map((prod) => (
-                    <div key={prod.productId || prod.id} className="col">
-                      <ProductCard product={prod} />
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
           </div>
-        )}
-      </main>
 
-      <CustomerFooter />
+          {/* Cart Summary Card */}
+          <div className="col-lg-4">
+            <div className="kc-card p-4 shadow-sm sticky-top" style={{ top: '100px' }}>
+              <h5 className="fw-bold text-dark mb-3">Order Summary</h5>
+
+              <div className="d-flex justify-content-between small text-muted mb-2">
+                <span>Subtotal ({totalItemsCount} items)</span>
+                <span className="fw-bold text-dark">{formatCurrency(cartSubtotal)}</span>
+              </div>
+
+              <div className="d-flex justify-content-between small text-muted mb-3 pb-3 border-bottom">
+                <span>Direct Dispatch & Logistics</span>
+                <span className="fw-bold text-dark">
+                  {deliveryFee === 0 ? <span className="text-success">FREE</span> : formatCurrency(deliveryFee)}
+                </span>
+              </div>
+
+              <div className="d-flex justify-content-between align-items-baseline mb-4">
+                <span className="fw-bold text-dark fs-6">Grand Total</span>
+                <span className="display-6 fw-extrabold text-success mb-0" style={{ fontSize: '1.8rem' }}>
+                  {formatCurrency(grandTotal)}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                className="kc-btn kc-btn-primary kc-btn-lg w-100 justify-content-center shadow-sm"
+                onClick={() => navigate('/customer/checkout')}
+                disabled={hasMultipleFarmers}
+              >
+                <span>Proceed to Checkout</span>
+                <i className="bi bi-arrow-right"></i>
+              </button>
+
+              <div className="mt-3 text-center">
+                <small className="text-muted" style={{ fontSize: '0.75rem' }}>
+                  <i className="bi bi-shield-check text-success me-1"></i>
+                  100% Secure Checkout powered by Razorpay
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Same-Farmer Recommendations (if available) */}
+      {farmerProducts.length > 0 && (
+        <section className="mt-5">
+          <div className="d-flex justify-content-between align-items-end mb-4">
+            <div>
+              <span className="kc-section-badge mb-1">Combine Shipment</span>
+              <h4 className="fw-extrabold text-dark mb-0">More from the Same Farm</h4>
+            </div>
+          </div>
+
+          <div className="row g-4">
+            {farmerProducts.map((prod) => (
+              <div key={prod.productId || prod.id} className="col-6 col-md-3">
+                <ProductCard product={prod} />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
-}
+};
+
+export default Cart;

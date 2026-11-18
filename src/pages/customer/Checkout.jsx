@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import CustomerNavbar from '../../components/customer/CustomerNavbar';
-import CustomerFooter from '../../components/customer/CustomerFooter';
-import RazorpayCheckoutButton from '../../components/payment/RazorpayCheckoutButton'; // Ensure this path matches where you saved the button
-import { customerService } from '../../services/customerService';
-import { useCart } from '../../context/CartContext';
-import 'bootstrap-icons/font/bootstrap-icons.css';
+import { useCart } from '../../hooks/useCart';
+import { useAuth } from '../../hooks/useAuth';
+import customerService from '../../services/customerService';
+import RazorpayCheckoutButton from '../../components/common/RazorpayCheckoutButton';
+import { formatCurrency } from '../../utils/formatters';
 
-export default function Checkout() {
+export const Checkout = () => {
   const { cartItems, cartSubtotal, totalItemsCount, clearCart } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [addresses, setAddresses] = useState([]);
@@ -18,38 +18,79 @@ export default function Checkout() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
+  // New Address inline toggle / state
+  const [showAddAddress, setShowAddAddress] = useState(false);
+  const [newAddress, setNewAddress] = useState({
+    fullName: '',
+    mobileNumber: '',
+    houseNo: '',
+    street: '',
+    village: '',
+    mandal: '',
+    district: '',
+    state: '',
+    pincode: '',
+    landmark: '',
+    addressType: 'HOME',
+  });
+
   const deliveryFee = cartSubtotal > 0 ? 49 : 0;
   const grandTotal = cartSubtotal + deliveryFee;
 
   useEffect(() => {
+    let isMounted = true;
     const fetchAddresses = async () => {
       try {
         setLoading(true);
         const data = await customerService.getAddresses();
-        setAddresses(data || []);
-        if (data && data.length > 0) {
-          setSelectedAddressId(data[0].addressId || data[0].id);
+        const addressList = Array.isArray(data) ? data : [];
+        if (isMounted) {
+          setAddresses(addressList);
+          if (addressList.length > 0) {
+            setSelectedAddressId(addressList[0].addressId || addressList[0].id);
+          }
         }
       } catch (err) {
-        console.warn('Failed to fetch addresses:', err);
-        setAddresses([]);
+        console.warn('Failed to load delivery addresses:', err);
+        if (isMounted) setAddresses([]);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
+
     fetchAddresses();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  // Standard COD Order Submission
-  const handlePlaceOrder = async (e) => {
-    e?.preventDefault();
-    if (!validateCheckout()) return;
-    executeOrderCreation('COD');
-  };
-
-  // Online Payment Success Callback
-  const handleOnlinePaymentSuccess = (paymentDetails) => {
-    executeOrderCreation('ONLINE', paymentDetails.razorpayPaymentId);
+  const handleAddAddressSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await customerService.addAddress(newAddress);
+      const updatedList = await customerService.getAddresses();
+      setAddresses(updatedList || []);
+      if (updatedList && updatedList.length > 0) {
+        const newest = updatedList[updatedList.length - 1];
+        setSelectedAddressId(newest.addressId || newest.id);
+      }
+      setShowAddAddress(false);
+      setNewAddress({
+        fullName: '',
+        mobileNumber: '',
+        houseNo: '',
+        street: '',
+        village: '',
+        mandal: '',
+        district: '',
+        state: '',
+        pincode: '',
+        landmark: '',
+        addressType: 'HOME',
+      });
+    } catch (err) {
+      alert('Failed to save address. Please check all required fields.');
+    }
   };
 
   const validateCheckout = () => {
@@ -77,229 +118,371 @@ export default function Checkout() {
         addressId: Number(selectedAddressId),
         farmerId: Number(cartItems[0]?.farmerId),
         paymentMethod: method,
-        transactionId: transactionId, // Passing to backend if your DTO supports it
+        transactionId: transactionId,
         orderItems: cartItems.map((item) => ({
-          productId: Number(item.id),
-          quantity: Number(item.quantity)
-        }))
+          productId: Number(item.id || item.productId),
+          quantity: Number(item.quantity),
+        })),
       };
 
       const response = await customerService.placeOrder(orderPayload);
-      
       clearCart();
       const orderId = response?.orderId || response?.id || 'success';
       navigate(`/customer/orders/${orderId}`, { state: { orderSuccess: true } });
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to place order. Please verify stock availability and try again.');
+      setError(
+        err.response?.data?.message ||
+          'Failed to place order. Please verify stock availability and try again.'
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
-  const getSelectedAddressDetails = () => {
-    return addresses.find(addr => String(addr.addressId || addr.id) === String(selectedAddressId));
+  const handlePlaceOrderCOD = (e) => {
+    e?.preventDefault();
+    if (!validateCheckout()) return;
+    executeOrderCreation('COD');
   };
 
-  if (cartItems.length === 0 && !submitting) {
-    return (
-      <div className="min-vh-100 bg-light d-flex flex-column">
-        <CustomerNavbar cartCount={totalItemsCount} />
-        <div className="container text-center py-5 my-auto" style={{marginTop:"100px"}}>
-          <div className="card border-0 shadow-sm p-5 rounded-4 bg-white d-inline-block">
-            <i className="bi bi-cart-x display-4 text-muted d-block mb-3"></i>
-            <h4>No items to checkout</h4>
-            <p className="text-muted">Your shopping cart is currently empty.</p>
-            <Link to="/customer/products" className="btn btn-kisan-primary mt-2">
-              Browse Products
-            </Link>
-          </div>
-        </div>
-        <CustomerFooter />
-      </div>
-    );
-  }
+  const handleOnlinePaymentSuccess = (paymentDetails) => {
+    executeOrderCreation('ONLINE', paymentDetails.razorpayPaymentId);
+  };
+
+  const selectedAddress = addresses.find(
+    (addr) => String(addr.addressId || addr.id) === String(selectedAddressId)
+  );
 
   return (
-    <div className="min-vh-100 bg-light d-flex flex-column" style={{marginTop:"100px"}}>
-      <CustomerNavbar cartCount={totalItemsCount} />
+    <div className="kc-container py-4">
+      {/* Header */}
+      <div className="mb-4">
+        <span className="kc-section-badge mb-1">
+          <i className="bi bi-shield-lock"></i> Secure Gateway
+        </span>
+        <h2 className="fw-extrabold text-dark mb-0">Order Checkout</h2>
+      </div>
 
-      <main className="container py-5 flex-grow-1">
-        <h2 className="fw-bold text-dark mb-4">
-          <i className="bi bi-shield-check text-success me-2"></i>Secure Order Checkout
-        </h2>
+      {error && (
+        <div
+          className="alert border-0 shadow-sm p-3 rounded-4 mb-4 d-flex align-items-center gap-2 small"
+          style={{ backgroundColor: 'var(--kc-crimson-red-subtle)', color: 'var(--kc-crimson-red)' }}
+        >
+          <i className="bi bi-exclamation-triangle-fill fs-5 flex-shrink-0"></i>
+          <span>{error}</span>
+        </div>
+      )}
 
-        {error && (
-          <div className="alert alert-danger shadow-sm mb-4" role="alert">
-            <i className="bi bi-exclamation-triangle-fill me-2"></i>{error}
-          </div>
-        )}
-
-        <div className="row g-4">
-          <div className="col-lg-8">
-            {/* Delivery Address Selection */}
-            <div className="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
-              <div className="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                <h5 className="fw-bold text-dark mb-0">
-                  <i className="bi bi-geo-alt text-success me-2"></i>1. Select Delivery Address
-                </h5>
-                <Link to="/customer/addresses" className="btn btn-sm btn-outline-success">
-                  + Add New Address
-                </Link>
-              </div>
-
-              {loading ? (
-                <div className="text-center py-3">
-                  <div className="spinner-border spinner-border-sm text-success" role="status"></div>
-                </div>
-              ) : addresses.length === 0 ? (
-                <div className="alert alert-warning mb-0 text-center">
-                  No delivery addresses found. Please <Link to="/customer/addresses" className="fw-bold text-dark">add an address</Link> before checking out.
-                </div>
-              ) : (
-                <div className="row g-3">
-                  {addresses.map((addr) => {
-                    const addrId = addr.addressId || addr.id;
-                    const isSelected = String(selectedAddressId) === String(addrId);
-                    return (
-                      <div key={addrId} className="col-md-6">
-                        <div
-                          onClick={() => setSelectedAddressId(addrId)}
-                          className={`card border p-3 h-100 rounded-3 transition-all ${
-                            isSelected ? 'border-success bg-light shadow-sm' : 'border-light bg-white'
-                          }`}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          <div className="form-check">
-                            <input
-                              className="form-check-input"
-                              type="radio"
-                              name="deliveryAddressRadio"
-                              id={`addr-${addrId}`}
-                              checked={isSelected}
-                              onChange={() => setSelectedAddressId(addrId)}
-                            />
-                            <label className="form-check-label fw-bold text-dark ms-1" htmlFor={`addr-${addrId}`}>
-                              {addr.fullName} ({addr.addressType || 'HOME'})
-                            </label>
-                          </div>
-                          <p className="text-muted fs-8 mt-2 mb-1">
-                            {addr.fullAddress || `${addr.houseNo || ''}, ${addr.street}, ${addr.district}, ${addr.state} ${addr.pincode}`}
-                          </p>
-                          <small className="text-success fw-medium">
-                            <i className="bi bi-telephone me-1"></i> {addr.mobileNumber}
-                          </small>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Payment Method Selection */}
-            <div className="card border-0 shadow-sm rounded-4 p-4 bg-white">
-              <h5 className="fw-bold text-dark mb-3 pb-2 border-bottom">
-                <i className="bi bi-wallet2 text-success me-2"></i>2. Choose Payment Method
+      <div className="row g-4">
+        {/* Left Column: Address & Payment Selection */}
+        <div className="col-lg-8">
+          {/* 1. Address Selection */}
+          <div className="kc-card p-4 mb-4 shadow-sm">
+            <div className="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+              <h5 className="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                <span className="kc-badge kc-badge-forest">1</span>
+                <span>Select Delivery Destination</span>
               </h5>
-              <div className="d-flex flex-column gap-3">
-                <div className={`form-check p-3 border rounded-3 ${paymentMethod === 'COD' ? 'bg-light border-success' : ''}`}>
-                  <input
-                    className="form-check-input mt-1"
-                    type="radio"
-                    name="paymentMethod"
-                    id="payCod"
-                    value="COD"
-                    checked={paymentMethod === 'COD'}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                  />
-                  <label className="form-check-label fw-bold text-dark d-block ms-2" htmlFor="payCod">
-                    Cash on Delivery (COD)
-                    <small className="text-muted fw-normal d-block">Pay with cash when your fresh harvest arrives at your doorstep.</small>
-                  </label>
-                </div>
-
-                <div className={`form-check p-3 border rounded-3 ${paymentMethod === 'ONLINE' ? 'bg-light border-success' : ''}`}>
-                  <input
-                    className="form-check-input mt-1"
-                    type="radio"
-                    name="paymentMethod"
-                    id="payOnline"
-                    value="ONLINE"
-                    checked={paymentMethod === 'ONLINE'}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                  />
-                  <label className="form-check-label fw-bold text-dark d-block ms-2" htmlFor="payOnline">
-                    Online Payment (UPI / NetBanking / Cards)
-                    <small className="text-muted fw-normal d-block">Secure digital payment gateway integration.</small>
-                  </label>
-                </div>
-              </div>
+              <button
+                type="button"
+                className="kc-btn kc-btn-outline kc-btn-sm"
+                onClick={() => setShowAddAddress(!showAddAddress)}
+              >
+                <i className={`bi ${showAddAddress ? 'bi-x-lg' : 'bi-plus-lg'}`}></i>
+                <span>{showAddAddress ? 'Cancel' : 'Add New Address'}</span>
+              </button>
             </div>
-          </div>
 
-          {/* Order Review Summary */}
-          <div className="col-lg-4">
-            <div className="card border-0 shadow-sm rounded-4 p-4 bg-white sticky-top" style={{ top: '90px' }}>
-              <h5 className="fw-bold text-dark mb-3 pb-2 border-bottom">Order Summary</h5>
-              <div className="d-flex flex-column gap-2 mb-3 max-vh-25 overflow-auto">
-                {cartItems.map((item) => (
-                  <div key={item.id} className="d-flex justify-content-between align-items-center fs-8">
-                    <span className="text-muted text-truncate" style={{ maxWidth: '180px' }}>
-                      {item.name} x {item.quantity} {item.unit}
-                    </span>
-                    <span className="fw-bold text-dark">₹{(item.price * item.quantity).toFixed(2)}</span>
+            {/* Inline Add Address Form */}
+            {showAddAddress && (
+              <form onSubmit={handleAddAddressSubmit} className="p-3 mb-4 rounded-4 border bg-light">
+                <h6 className="fw-bold text-success mb-3">Add Delivery Address</h6>
+                <div className="row g-3">
+                  <div className="col-md-6">
+                    <label className="kc-label small">Full Name</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Recipient's Name"
+                      className="kc-input"
+                      value={newAddress.fullName}
+                      onChange={(e) => setNewAddress({ ...newAddress, fullName: e.target.value })}
+                    />
                   </div>
-                ))}
-              </div>
+                  <div className="col-md-6">
+                    <label className="kc-label small">Mobile Number</label>
+                    <input
+                      type="tel"
+                      required
+                      maxLength={10}
+                      placeholder="10-digit number"
+                      className="kc-input"
+                      value={newAddress.mobileNumber}
+                      onChange={(e) => setNewAddress({ ...newAddress, mobileNumber: e.target.value })}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="kc-label small">House / Flat No.</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. 4-12/A"
+                      className="kc-input"
+                      value={newAddress.houseNo}
+                      onChange={(e) => setNewAddress({ ...newAddress, houseNo: e.target.value })}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="kc-label small">Street / Landmark</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Street name"
+                      className="kc-input"
+                      value={newAddress.street}
+                      onChange={(e) => setNewAddress({ ...newAddress, street: e.target.value })}
+                    />
+                  </div>
+                  <div className="col-md-4">
+                    <label className="kc-label small">City / Village</label>
+                    <input
+                      type="text"
+                      required
+                      className="kc-input"
+                      value={newAddress.village}
+                      onChange={(e) => setNewAddress({ ...newAddress, village: e.target.value })}
+                    />
+                  </div>
+                  <div className="col-md-4">
+                    <label className="kc-label small">State</label>
+                    <input
+                      type="text"
+                      required
+                      className="kc-input"
+                      value={newAddress.state}
+                      onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })}
+                    />
+                  </div>
+                  <div className="col-md-4">
+                    <label className="kc-label small">Pincode</label>
+                    <input
+                      type="text"
+                      required
+                      maxLength={6}
+                      className="kc-input"
+                      value={newAddress.pincode}
+                      onChange={(e) => setNewAddress({ ...newAddress, pincode: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="mt-3 text-end">
+                  <button type="submit" className="kc-btn kc-btn-primary kc-btn-sm">
+                    Save and Select Address
+                  </button>
+                </div>
+              </form>
+            )}
 
-              <div className="border-top pt-3">
-                <div className="d-flex justify-content-between mb-2 fs-7">
-                  <span className="text-muted">Subtotal</span>
-                  <span className="fw-bold text-dark">₹{cartSubtotal.toFixed(2)}</span>
-                </div>
-                <div className="d-flex justify-content-between mb-3 fs-7 pb-3 border-bottom">
-                  <span className="text-muted">Delivery Charge</span>
-                  <span className="fw-bold text-success">₹{deliveryFee}</span>
-                </div>
-                <div className="d-flex justify-content-between mb-4 fs-5 fw-bold">
-                  <span className="text-dark">Total Amount</span>
-                  <span className="text-success">₹{grandTotal.toFixed(2)}</span>
-                </div>
-              </div>
+            {/* Address Cards Radio List */}
+            {loading ? (
+              <div className="p-3 text-muted small">Loading addresses...</div>
+            ) : addresses.length > 0 ? (
+              <div className="d-flex flex-column gap-2.5">
+                {addresses.map((addr) => {
+                  const aid = addr.addressId || addr.id;
+                  const isChecked = String(aid) === String(selectedAddressId);
 
-              {paymentMethod === 'ONLINE' ? (
-                <RazorpayCheckoutButton 
-                  amountInRupees={grandTotal}
-                  customerDetails={getSelectedAddressDetails()}
-                  onSuccess={handleOnlinePaymentSuccess}
-                  disabled={submitting || addresses.length === 0 || !selectedAddressId}
-                />
-              ) : (
+                  return (
+                    <label
+                      key={aid}
+                      className={`p-3 rounded-4 border d-flex align-items-start gap-3 cursor-pointer transition-all ${
+                        isChecked ? 'border-success bg-white shadow-xs' : 'bg-light border-light'
+                      }`}
+                      style={{ cursor: 'pointer', borderWidth: isChecked ? '2px' : '1px' }}
+                    >
+                      <input
+                        type="radio"
+                        name="addressRadio"
+                        className="form-check-input mt-1"
+                        checked={isChecked}
+                        onChange={() => setSelectedAddressId(aid)}
+                      />
+                      <div className="flex-grow-1">
+                        <div className="d-flex align-items-center gap-2 mb-1">
+                          <strong className="text-dark">{addr.fullName}</strong>
+                          <span className="badge kc-badge-cream" style={{ fontSize: '0.7rem' }}>
+                            {addr.addressType || 'HOME'}
+                          </span>
+                        </div>
+                        <p className="text-muted small mb-1">
+                          {addr.houseNo}, {addr.street}, {addr.village}, {addr.district || ''}, {addr.state} - {addr.pincode}
+                        </p>
+                        <small className="text-muted">
+                          <i className="bi bi-telephone text-success me-1"></i> {addr.mobileNumber}
+                        </small>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-4 bg-light rounded-4">
+                <i className="bi bi-geo-alt text-muted fs-3 d-block mb-2"></i>
+                <p className="text-muted small mb-2">No delivery addresses found on your account.</p>
                 <button
                   type="button"
-                  onClick={handlePlaceOrder}
-                  disabled={submitting || addresses.length === 0 || !selectedAddressId}
-                  className="btn btn-success btn-lg w-100 d-flex align-items-center justify-content-center gap-2 shadow-sm"
+                  className="kc-btn kc-btn-primary kc-btn-sm"
+                  onClick={() => setShowAddAddress(true)}
                 >
-                  {submitting ? (
-                    <>
-                      <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                      <span>Processing Order...</span>
-                    </>
-                  ) : (
-                    <>
-                      <i className="bi bi-check-circle"></i>
-                      <span>Place Order Now</span>
-                    </>
-                  )}
+                  Add Your First Address
                 </button>
-              )}
+              </div>
+            )}
+          </div>
+
+          {/* 2. Payment Method Selection */}
+          <div className="kc-card p-4 shadow-sm">
+            <h5 className="fw-bold text-dark mb-3 pb-2 border-bottom d-flex align-items-center gap-2">
+              <span className="kc-badge kc-badge-forest">2</span>
+              <span>Payment Option</span>
+            </h5>
+
+            <div className="row g-3 mb-4">
+              {/* COD Option */}
+              <div className="col-sm-6">
+                <div
+                  className={`p-3 rounded-4 border text-center cursor-pointer transition-all h-100 ${
+                    paymentMethod === 'COD'
+                      ? 'border-success bg-white shadow-xs'
+                      : 'border-light bg-light'
+                  }`}
+                  onClick={() => setPaymentMethod('COD')}
+                  style={{ cursor: 'pointer', borderWidth: paymentMethod === 'COD' ? '2px' : '1px' }}
+                >
+                  <div
+                    className="rounded-circle d-inline-flex p-2.5 mb-2"
+                    style={{ backgroundColor: 'var(--kc-fresh-green-light)', color: 'var(--kc-fresh-green)' }}
+                  >
+                    <i className="bi bi-cash-stack fs-4"></i>
+                  </div>
+                  <strong className="d-block small text-dark mb-1">Cash on Delivery</strong>
+                  <span className="text-muted" style={{ fontSize: '0.75rem' }}>
+                    Pay cash upon harvest inspection
+                  </span>
+                </div>
+              </div>
+
+              {/* Online Payment (Razorpay) Option */}
+              <div className="col-sm-6">
+                <div
+                  className={`p-3 rounded-4 border text-center cursor-pointer transition-all h-100 ${
+                    paymentMethod === 'ONLINE'
+                      ? 'border-success bg-white shadow-xs'
+                      : 'border-light bg-light'
+                  }`}
+                  onClick={() => setPaymentMethod('ONLINE')}
+                  style={{ cursor: 'pointer', borderWidth: paymentMethod === 'ONLINE' ? '2px' : '1px' }}
+                >
+                  <div
+                    className="rounded-circle d-inline-flex p-2.5 mb-2"
+                    style={{ backgroundColor: 'var(--kc-fresh-green-light)', color: 'var(--kc-fresh-green)' }}
+                  >
+                    <i className="bi bi-credit-card-2-front fs-4"></i>
+                  </div>
+                  <strong className="d-block small text-dark mb-1">UPI, Cards, NetBanking</strong>
+                  <span className="text-muted" style={{ fontSize: '0.75rem' }}>
+                    Instant & secure via Razorpay
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Trigger based on selected Payment Method */}
+            {paymentMethod === 'ONLINE' ? (
+              <RazorpayCheckoutButton
+                amountInRupees={grandTotal}
+                customerDetails={{
+                  fullName: selectedAddress?.fullName || user?.name || 'Customer',
+                  email: user?.email || 'customer@kisanconnect.com',
+                  mobileNumber: selectedAddress?.mobileNumber || user?.mobileNumber || '9999999999',
+                }}
+                disabled={!selectedAddressId || submitting}
+                onSuccess={handleOnlinePaymentSuccess}
+              />
+            ) : (
+              <button
+                type="button"
+                onClick={handlePlaceOrderCOD}
+                disabled={!selectedAddressId || submitting}
+                className="kc-btn kc-btn-primary kc-btn-lg w-100 justify-content-center shadow-sm"
+              >
+                {submitting ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                    <span>Confirming Order...</span>
+                  </>
+                ) : (
+                  <>
+                    <i className="bi bi-check2-circle"></i>
+                    <span>Confirm Order ({formatCurrency(grandTotal)}) via COD</span>
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Right Column: Order Items Summary */}
+        <div className="col-lg-4">
+          <div className="kc-card p-4 shadow-sm sticky-top" style={{ top: '100px' }}>
+            <h5 className="fw-bold text-dark mb-3">Order Items ({totalItemsCount})</h5>
+
+            <div className="d-flex flex-column gap-2 mb-3 pb-3 border-bottom overflow-auto" style={{ maxHeight: '240px' }}>
+              {cartItems.map((item) => (
+                <div key={item.cartId || item.id} className="d-flex justify-content-between align-items-center small">
+                  <div>
+                    <strong className="d-block text-dark text-truncate" style={{ maxWidth: '180px' }}>
+                      {item.name}
+                    </strong>
+                    <span className="text-muted">{item.quantity} {item.unit || 'kg'} × {formatCurrency(item.price)}</span>
+                  </div>
+                  <span className="fw-bold text-dark">
+                    {formatCurrency(Number(item.price || 0) * Number(item.quantity || 1))}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="d-flex justify-content-between small text-muted mb-2">
+              <span>Subtotal</span>
+              <span className="fw-bold text-dark">{formatCurrency(cartSubtotal)}</span>
+            </div>
+
+            <div className="d-flex justify-content-between small text-muted mb-3 pb-3 border-bottom">
+              <span>Delivery Logistics</span>
+              <span className="fw-bold text-dark">
+                {deliveryFee === 0 ? <span className="text-success">FREE</span> : formatCurrency(deliveryFee)}
+              </span>
+            </div>
+
+            <div className="d-flex justify-content-between align-items-baseline mb-4">
+              <span className="fw-bold text-dark fs-6">Grand Total</span>
+              <span className="display-6 fw-extrabold text-success mb-0" style={{ fontSize: '1.75rem' }}>
+                {formatCurrency(grandTotal)}
+              </span>
+            </div>
+
+            <div className="p-3 rounded-3 text-center" style={{ backgroundColor: 'var(--kc-cream)' }}>
+              <small className="text-muted d-block" style={{ fontSize: '0.78rem' }}>
+                <i className="bi bi-patch-check-fill text-success me-1"></i>
+                Dispatched directly from local farm gate in eco-packaging.
+              </small>
             </div>
           </div>
         </div>
-      </main>
-
-      <CustomerFooter />
+      </div>
     </div>
   );
-}
+};
+
+export default Checkout;
