@@ -150,10 +150,10 @@ export function Home() {
             <div className="position-relative z-2 px-4 pb-4 d-none d-lg-block">
               <div className="row g-3">
                 
-                <div className="col">
-                  <div className="card border-0 shadow-lg rounded-4 p-3.5 bg-white bg-opacity-95 backdrop-blur transition-hover">
-                    <div className="d-flex align-items-center justify-content-between mb-2">
-                      <div className="d-flex align-items-center gap-2">
+                <div className="col p-3">
+                  <div className="p-3 ard border-0 shadow-lg rounded-4 p-3.5 bg-white bg-opacity-95 backdrop-blur transition-hover">
+                    <div className="d-flex align-items-center justify-content-between mb-2 p-3">
+                      <div className="d-flex align-items-center gap-2 p-3">
                         <div className="bg-success bg-opacity-15 text-success rounded-circle d-flex align-items-center justify-content-center" style={{ width: '32px', height: '32px' }}>
                           <span className="material-symbols-outlined fs-6">eco</span>
                         </div>
@@ -166,11 +166,11 @@ export function Home() {
                   </div>
                 </div>
 
-                <div className="col">
-                  <div className="card border-0 shadow-lg rounded-4 p-3.5 bg-white bg-opacity-95 backdrop-blur transition-hover">
-                    <div className="d-flex align-items-center justify-content-between mb-2">
-                      <div className="d-flex align-items-center gap-2">
-                        <div className="bg-warning bg-opacity-15 text-warning rounded-circle d-flex align-items-center justify-content-center" style={{ width: '32px', height: '32px' }}>
+                <div className="col p-3">
+                  <div className="p-3 card border-0 shadow-lg rounded-4 p-3.5 bg-white bg-opacity-95 backdrop-blur transition-hover">
+                    <div className="d-flex p-3 align-items-center justify-content-between mb-2">
+                      <div className="d-flex align-items-center gap-2 p-3">
+                        <div className="p-3 bg-warning bg-opacity-15 text-warning rounded-circle d-flex align-items-center justify-content-center" style={{ width: '32px', height: '32px' }}>
                           <span className="material-symbols-outlined fs-6">nutrition</span>
                         </div>
                         <span className="fw-bold text-dark small">Seasonal Fruits</span>
@@ -182,11 +182,11 @@ export function Home() {
                   </div>
                 </div>
 
-                <div className="col">
-                  <div className="card border-0 shadow-lg rounded-4 p-3.5 bg-white bg-opacity-95 backdrop-blur transition-hover">
+                <div className="col p-3">
+                  <div className="p-3 card border-0 shadow-lg rounded-4 p-3.5 bg-white bg-opacity-95 backdrop-blur transition-hover">
                     <div className="d-flex align-items-center justify-content-between mb-2">
-                      <div className="d-flex align-items-center gap-2">
-                        <div className="bg-success bg-opacity-15 text-success rounded-circle d-flex align-items-center justify-content-center" style={{ width: '32px', height: '32px' }}>
+                      <div className="d-flex align-items-center gap-2 p-3">
+                        <div className="p-3 bg-success bg-opacity-15 text-success rounded-circle d-flex align-items-center justify-content-center" style={{ width: '32px', height: '32px' }}>
                           <span className="material-symbols-outlined fs-6">verified</span>
                         </div>
                         <span className="fw-bold text-dark small">Verified Farmers</span>
@@ -198,11 +198,11 @@ export function Home() {
                   </div>
                 </div>
 
-                <div className="col">
-                  <div className="card border-0 shadow-lg rounded-4 p-3.5 bg-white bg-opacity-95 backdrop-blur transition-hover">
-                    <div className="d-flex align-items-center justify-content-between mb-2">
-                      <div className="d-flex align-items-center gap-2">
-                        <div className="bg-info bg-opacity-15 text-info rounded-circle d-flex align-items-center justify-content-center" style={{ width: '32px', height: '32px' }}>
+                <div className="col p-3">
+                  <div className="p-3 card border-0 shadow-lg rounded-4 p-3.5 bg-white bg-opacity-95 backdrop-blur transition-hover">
+                    <div className="p-3 d-flex align-items-center justify-content-between mb-2">
+                      <div className="p-3 d-flex align-items-center gap-2">
+                        <div className="p-3 bg-info bg-opacity-15 text-info rounded-circle d-flex align-items-center justify-content-center" style={{ width: '32px', height: '32px' }}>
                           <span className="material-symbols-outlined fs-6">local_shipping</span>
                         </div>
                         <span className="fw-bold text-dark small">Fast Delivery</span>
