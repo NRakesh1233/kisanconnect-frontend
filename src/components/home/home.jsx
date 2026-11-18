@@ -24,22 +24,25 @@ export function Home() {
 
   const bannerSlides = [
     {
-      badge: "Direct From Farm",
-      title: "Fresh From Farms to Your Home",
-      desc: "Buy directly from local farmers with fresh, healthy, and affordable products. Support rural communities while feeding your family the best nature offers.",
-      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuDkPnOFRzr4wEzP6VKFX_iVKp0YXOzykQLg_ZRrGDhEyIdSVHb9SthpJZrVDloVeWafA53mAK2AMJWzcuNdAz-xuKH_FFMHPNEwlLkpBkzLsKPOyqGYwHLAyRJ6on6i-c9OghkFKOCaWiW87v0-ArAyQtVn0CSvPTRjqu0M2w-40zdoFWsm3jgAnBkuXGlALbaLwqru9KiohA2g9DiUGVHsKBHagL-XAuAxgeArzQ1VqCETxEZEkYje"
+      badge: "Direct Farm to Table",
+      subtitle: "Return up to 100% organic freshness * per harvest",
+      title: "Fresh Organic Produce, Straight From Farms",
+      desc: "Take control of your healthy lifestyle with farm-direct vegetables, grains, and fruits delivered straight to your doorstep right from local organic stewards.",
+      img: "https://images.unsplash.com/photo-1595855759920-86582396756a?auto=format&fit=crop&q=80&w=1200"
     },
     {
-      badge: "100% Organic Produce",
+      badge: "Sustainable Agriculture",
+      subtitle: "Grown with zero synthetic chemicals",
       title: "Harvested Strictly With Sustainable Care",
-      desc: "Experience chemical-free vegetables and seasonal fruits grown by trusted local agricultural stewards dedicated to earth-friendly farming.",
+      desc: "Experience nutrient-rich vegetables and seasonal fruits grown by trusted local agricultural partners dedicated to earth-friendly farming.",
       img: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&q=80&w=1200"
     },
     {
       badge: "Lightning Fast Logistics",
+      subtitle: "Rapid soil-to-doorstep delivery",
       title: "From Soil to Doorstep in Record Time",
       desc: "Our streamlined farm-to-table delivery network ensures your organic goods arrive crisp, fresh, and packed with farm-fresh nutrients.",
-      img: "https://images.unsplash.com/photo-1595855759920-86582396756a?auto=format&fit=crop&q=80&w=1200"
+      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuDkPnOFRzr4wEzP6VKFX_iVKp0YXOzykQLg_ZRrGDhEyIdSVHb9SthpJZrVDloVeWafA53mAK2AMJWzcuNdAz-xuKH_FFMHPNEwlLkpBkzLsKPOyqGYwHLAyRJ6on6i-c9OghkFKOCaWiW87v0-ArAyQtVn0CSvPTRjqu0M2w-40zdoFWsm3jgAnBkuXGlALbaLwqru9KiohA2g9DiUGVHsKBHagL-XAuAxgeArzQ1VqCETxEZEkYje"
     }
   ];
 
@@ -98,72 +101,134 @@ export function Home() {
         <div className="ambient-orb orb-2"></div>
         <div className="ambient-orb orb-3"></div>
 
-        {/* 1. IMMERSIVE HERO CAROUSEL SECTION */}
-        <section ref={heroRef} className="container-fluid kc-hero-fullscreen d-flex align-items-center py-5 position-relative z-1">
-          <div className="container-xxl px-4 py-5">
-            <div className="row align-items-center g-5">
-              
-              <div className="col-lg-6 hero-slide-anim">
-                <div className="d-inline-flex align-items-center gap-2 px-3.5 py-1.5 mb-3 rounded-pill bg-success bg-opacity-10 text-success border border-success border-opacity-25 fs-8 fw-bold">
-                  <i className="bi bi-patch-check-fill"></i> {bannerSlides[activeBanner].badge}
-                </div>
-                <h1 className="display-3 fw-extrabold text-dark mb-4 lh-tight tracking-tight">
-                  {bannerSlides[activeBanner].title}
-                </h1>
-                <p className="text-muted lead fs-5 mb-5 lh-base" style={{ maxWidth: '540px' }}>
-                  {bannerSlides[activeBanner].desc}
-                </p>
-                <div className="d-flex gap-3 flex-wrap">
-                  <Link to="/customer/home" className="text-decoration-none">
-                    <button className="btn btn-success px-5 py-3.5 rounded-pill fw-bold shadow-hover d-flex align-items-center gap-2 fs-6">
-                      <span>Explore as Customer</span> <i className="bi bi-arrow-right"></i>
-                    </button>
-                  </Link>
-                  <Link to="/dashboard" className="text-decoration-none">
-                    <button className="btn btn-outline-dark px-4.5 py-3.5 rounded-pill fw-bold shadow-hover bg-white bg-opacity-50 fs-6">
-                      Explore as Farmer
-                    </button>
-                  </Link>
-                </div>
+        {/* 1. DRIBBBLE-INSPIRED HERO SECTION BANNER */}
+        <section ref={heroRef} className="container-fluid px-3 px-lg-5 pt-5 mt-4 position-relative z-1">
+          <div className="kisan-hero-banner position-relative overflow-hidden rounded-5 shadow-2xl" style={{ minHeight: '540px' }}>
+            
+            {/* Background Image with Dark Gradient Overlay */}
+            <div 
+              className="position-absolute top-0 start-0 w-100 h-100"
+              style={{
+                backgroundImage: `linear-gradient(90deg, rgba(15, 23, 18, 0.92) 0%, rgba(15, 23, 18, 0.75) 50%, rgba(15, 23, 18, 0.4) 100%), url('${bannerSlides[activeBanner].img}')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                transition: 'background-image 0.8s ease-in-out',
+                zIndex: 1
+              }}
+            ></div>
 
-                {/* Banner Indicators */}
-                <div className="d-flex gap-2 mt-5 pt-3">
-                  {bannerSlides.map((_, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setActiveBanner(idx)}
-                      className={`rounded-pill border-0 transition-all ${activeBanner === idx ? 'bg-success active-dot' : 'bg-secondary bg-opacity-25'}`}
-                      style={{ width: activeBanner === idx ? '40px' : '12px', height: '10px', transition: 'width 0.4s ease' }}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div className="col-lg-6">
-                <div className="position-relative">
-                  <div className="glass-card-hero rounded-5 overflow-hidden shadow-2xl p-3 bg-white bg-opacity-75">
-                    <img 
-                      src={bannerSlides[activeBanner].img} 
-                      alt="Farm Banner" 
-                      className="w-100 h-100 object-fit-cover rounded-4 kc-carousel-img shadow-sm"
-                      style={{ height: '480px' }}
-                    />
-                  </div>
-                  
-                  {/* Floating Glass Badge */}
-                  <div className="position-absolute bottom-0 start-0 m-4 p-4 rounded-4 glass-card bg-white shadow-lg d-flex align-items-center gap-3 border border-success border-opacity-15 animate-float">
-                    <div className="rounded-circle bg-success text-white d-flex align-items-center justify-content-center shadow-sm" style={{ width: '54px', height: '54px' }}>
-                      <i className="bi bi-truck fs-3"></i>
-                    </div>
-                    <div>
-                      <h6 className="fw-bold text-dark mb-0 fs-7">Same Day Logistics</h6>
-                      <small className="text-muted">Direct from local soil</small>
-                    </div>
+            {/* Hero Main Content */}
+            <div className="container-xxl position-relative z-2 py-5 px-4 px-lg-5 d-flex flex-column justify-content-center" style={{ minHeight: '460px' }}>
+              <div className="row align-items-center">
+                <div className="col-lg-7 text-white py-4 hero-slide-anim">
+                  <span className="d-block text-success fw-semibold small mb-2 tracking-wider">
+                    {bannerSlides[activeBanner].subtitle}
+                  </span>
+                  <h1 className="display-4 fw-extrabold text-white mb-3 lh-tight tracking-tight">
+                    {bannerSlides[activeBanner].title}
+                  </h1>
+                  <p className="text-light opacity-85 fs-6 mb-4 lh-base" style={{ maxWidth: '560px' }}>
+                    {bannerSlides[activeBanner].desc}
+                  </p>
+                  <div className="d-flex flex-wrap gap-3 align-items-center">
+                    <Link to="/customer/home" className="text-decoration-none">
+                      <button className="btn btn-success btn-lg px-4.5 py-3 rounded-pill fw-bold shadow-hover d-flex align-items-center gap-2">
+                        <span>EXPLORE MARKETPLACE</span> <i className="bi bi-arrow-right"></i>
+                      </button>
+                    </Link>
+                    <Link to="/dashboard" className="text-decoration-none">
+                      <button className="btn btn-outline-light btn-lg px-4.5 py-3 rounded-pill fw-semibold shadow-hover d-flex align-items-center gap-2 bg-white bg-opacity-10 backdrop-blur">
+                        <i className="bi bi-play-circle-fill text-success fs-5"></i> <span>Watch Farmer Story</span>
+                      </button>
+                    </Link>
                   </div>
                 </div>
               </div>
-
             </div>
+
+            {/* Overlapping Floating Bottom Cards (Dribbble Style Ticker) */}
+            <div className="position-relative z-2 px-4 pb-4 d-none d-lg-block">
+              <div className="row g-3">
+                
+                <div className="col">
+                  <div className="card border-0 shadow-lg rounded-4 p-3.5 bg-white bg-opacity-95 backdrop-blur transition-hover">
+                    <div className="d-flex align-items-center justify-content-between mb-2">
+                      <div className="d-flex align-items-center gap-2">
+                        <div className="bg-success bg-opacity-15 text-success rounded-circle d-flex align-items-center justify-content-center" style={{ width: '32px', height: '32px' }}>
+                          <span className="material-symbols-outlined fs-6">eco</span>
+                        </div>
+                        <span className="fw-bold text-dark small">Organic Veggies</span>
+                      </div>
+                      <span className="text-success small fw-bold">+16.5% fresh</span>
+                    </div>
+                    <div className="text-muted" style={{ fontSize: '0.75rem' }}>Harvested Today</div>
+                    <div className="fw-bold text-dark fs-6 mt-1">₹35 / kg avg</div>
+                  </div>
+                </div>
+
+                <div className="col">
+                  <div className="card border-0 shadow-lg rounded-4 p-3.5 bg-white bg-opacity-95 backdrop-blur transition-hover">
+                    <div className="d-flex align-items-center justify-content-between mb-2">
+                      <div className="d-flex align-items-center gap-2">
+                        <div className="bg-warning bg-opacity-15 text-warning rounded-circle d-flex align-items-center justify-content-center" style={{ width: '32px', height: '32px' }}>
+                          <span className="material-symbols-outlined fs-6">nutrition</span>
+                        </div>
+                        <span className="fw-bold text-dark small">Seasonal Fruits</span>
+                      </div>
+                      <span className="text-success small fw-bold">+18.2% organic</span>
+                    </div>
+                    <div className="text-muted" style={{ fontSize: '0.75rem' }}>Direct from Farms</div>
+                    <div className="fw-bold text-dark fs-6 mt-1">₹55 / kg avg</div>
+                  </div>
+                </div>
+
+                <div className="col">
+                  <div className="card border-0 shadow-lg rounded-4 p-3.5 bg-white bg-opacity-95 backdrop-blur transition-hover">
+                    <div className="d-flex align-items-center justify-content-between mb-2">
+                      <div className="d-flex align-items-center gap-2">
+                        <div className="bg-success bg-opacity-15 text-success rounded-circle d-flex align-items-center justify-content-center" style={{ width: '32px', height: '32px' }}>
+                          <span className="material-symbols-outlined fs-6">verified</span>
+                        </div>
+                        <span className="fw-bold text-dark small">Verified Farmers</span>
+                      </div>
+                      <span className="text-success small fw-bold">100% Secure</span>
+                    </div>
+                    <div className="text-muted" style={{ fontSize: '0.75rem' }}>Active Partners</div>
+                    <div className="fw-bold text-dark fs-6 mt-1">450+ Stewards</div>
+                  </div>
+                </div>
+
+                <div className="col">
+                  <div className="card border-0 shadow-lg rounded-4 p-3.5 bg-white bg-opacity-95 backdrop-blur transition-hover">
+                    <div className="d-flex align-items-center justify-content-between mb-2">
+                      <div className="d-flex align-items-center gap-2">
+                        <div className="bg-info bg-opacity-15 text-info rounded-circle d-flex align-items-center justify-content-center" style={{ width: '32px', height: '32px' }}>
+                          <span className="material-symbols-outlined fs-6">local_shipping</span>
+                        </div>
+                        <span className="fw-bold text-dark small">Fast Delivery</span>
+                      </div>
+                      <span className="text-success small fw-bold">Live Transit</span>
+                    </div>
+                    <div className="text-muted" style={{ fontSize: '0.75rem' }}>Doorstep Transit</div>
+                    <div className="fw-bold text-dark fs-6 mt-1">Within 24 Hours</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* Banner Indicators */}
+            <div className="position-absolute bottom-0 end-0 m-4 z-3 d-flex gap-2 p-2 rounded-pill bg-dark bg-opacity-25 backdrop-blur">
+              {bannerSlides.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveBanner(idx)}
+                  className={`rounded-pill border-0 transition-all ${activeBanner === idx ? 'bg-success active-dot' : 'bg-white bg-opacity-50'}`}
+                  style={{ width: activeBanner === idx ? '28px' : '10px', height: '8px', transition: 'width 0.4s ease' }}
+                />
+              ))}
+            </div>
+
           </div>
         </section>
 
@@ -342,7 +407,7 @@ export function Home() {
         {/* 6. SUPPORT BANNER */}
         <section ref={supportRef} className="container-xxl px-4 py-5 mb-5 position-relative z-1 reveal-section">
           <div className="glass-card card border-0 text-center rounded-5 shadow-2xl p-5 bg-white position-relative overflow-hidden border border-success border-opacity-15">
-            <h2 className="fw-extrabold text-dark fs-1 mb-3">Support Local Farmers &amp; Eat Better Today</h2>
+            <h2 className="fw-extrabold text-dark fs-1 mb-3">Support Local Farmers & Eat Better Today</h2>
             <p className="text-muted lead fs-6 mx-auto mb-4 lh-base" style={{ maxWidth: '650px' }}>
               Join thousands of households across the country who have already switched to farm-direct produce. Healthy families, happy farmers.
             </p>

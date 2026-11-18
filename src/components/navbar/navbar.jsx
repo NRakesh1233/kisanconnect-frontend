@@ -34,11 +34,9 @@ export function Navbar({ menu = [], role }) {
     }
   }, []);
 
-  // Helper to check all potential backend image property keys
   const getProfileImageSrc = (profileObj) => {
     if (!profileObj) return '';
     const imgProp = profileObj.profilePic || profileObj.profilePicture || profileObj.image || profileObj.photo || profileObj.avatar;
-    
     if (!imgProp) return '';
     if (imgProp.startsWith('blob:') || imgProp.startsWith('http://') || imgProp.startsWith('https://')) return imgProp;
     if (imgProp.includes('/uploads/')) return `${BASE_URL}${imgProp}`;
@@ -88,7 +86,7 @@ export function Navbar({ menu = [], role }) {
 
   return (
     <>
-      {/* 1. MOBILE TOP HEADER (Shows Brand Title & Profile/Logout on mobile) */}
+      {/* 1. MOBILE TOP HEADER */}
       <div className="mobile-top-header d-flex d-lg-none align-items-center justify-content-between px-4 py-3 fixed-top shadow-sm">
         <NavLink to="/" end className="navbar-brand fw-extrabold text-decoration-none d-flex align-items-center gap-2">
           <div className="bg-success text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style={{ width: '32px', height: '32px' }}>
@@ -126,11 +124,11 @@ export function Navbar({ menu = [], role }) {
         </div>
       </div>
 
-      {/* 2. MAIN NAVBAR (Floating Desktop Navbar & Transparent Bottom Dock for Mobile) */}
+      {/* 2. DRIBBBLE FLOATING CAPSULE NAVBAR */}
       <nav className={`dribbble-floating-navbar ${scrolled ? 'scrolled' : ''}`}>
         <div className="navbar-glass-container d-flex align-items-center justify-content-between px-4 py-2">
           
-          {/* Desktop Left: Brand / Logo */}
+          {/* Brand Logo */}
           <NavLink to="/" end className="navbar-brand fw-extrabold text-decoration-none d-none d-lg-flex align-items-center gap-2 brand-logo-link">
             <div className="logo-icon-wrapper bg-success text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style={{ width: '38px', height: '38px' }}>
               <i className="bi bi-tree-fill fs-6"></i>
@@ -138,7 +136,7 @@ export function Navbar({ menu = [], role }) {
             <span className="fs-5 text-dark fw-bold">Kisan<span className="text-success">Connect</span></span>
           </NavLink>
 
-          {/* Center / Mobile: Menu Items wrapped in the glass menu pill container */}
+          {/* Menu Items Capsule Pill */}
           <div className="menu d-flex align-items-center gap-1 p-1 rounded-pill glass-menu-pill w-100 justify-content-around justify-content-lg-center">
             {menu.map((item, index) => {
               const path = getRoutePath(item);
@@ -147,7 +145,7 @@ export function Navbar({ menu = [], role }) {
 
               if (item.toLowerCase().includes("about")) {
                 return (
-                  <a key={index} href="#differances" className="text-decoration-none menu-item-link px-3 py-2 rounded-pill position-relative">
+                  <a key={index} href="#differances" className="text-decoration-none menu-item-link px-3.5 py-2 rounded-pill position-relative">
                     <button className="menu-nav-btn bg-transparent border-0 d-flex flex-column flex-lg-row align-items-center gap-lg-2 cursor-pointer w-100">
                       <i className={`bi ${iconClass} fs-6`}></i>
                       <span className="menu-text fw-semibold small">{item}</span>
@@ -165,7 +163,7 @@ export function Navbar({ menu = [], role }) {
                   end={isExactDashboard}
                   state={stateData}
                   className={({ isActive }) => 
-                    `text-decoration-none menu-item-link px-3 py-2 rounded-pill position-relative transition-all ${isActive ? "active-menu-item" : "text-muted"}`
+                    `text-decoration-none menu-item-link px-3.5 py-2 rounded-pill position-relative transition-all ${isActive ? "active-menu-item" : "text-muted"}`
                   }
                 >
                   <button className="menu-nav-btn bg-transparent border-0 d-flex flex-column flex-lg-row align-items-center gap-lg-2 cursor-pointer w-100">
@@ -177,7 +175,7 @@ export function Navbar({ menu = [], role }) {
             })}
           </div>
 
-          {/* Desktop Right: Profile Icon & Logout */}
+          {/* Right Profile & Actions */}
           <div className="features d-none d-lg-flex align-items-center gap-3">
             <NavLink to="/dashboard/profile" className="profile-avatar-wrapper position-relative text-decoration-none" title="Profile">
               <div className="avatar-ring p-1 rounded-circle transition-all d-flex align-items-center">
@@ -200,7 +198,7 @@ export function Navbar({ menu = [], role }) {
               </div>
             </NavLink>
             {localStorage.getItem("Authorization") && (
-              <button onClick={handleLogout} className="btn btn-outline-danger btn-sm rounded-pill fw-bold">
+              <button onClick={handleLogout} className="btn btn-outline-danger btn-sm rounded-pill fw-bold px-3">
                 Logout
               </button>
             )}
