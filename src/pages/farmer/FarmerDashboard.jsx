@@ -32,9 +32,9 @@ export const FarmerDashboard = () => {
   const totalRevenueAmount = Number(stats.revenue) || 0;
   const ratingValue = Number(stats.rating) || 0;
 
-  const countProducts = useCountUp(activeProductsCount, 1000);
-  const countOrders = useCountUp(totalOrdersCount, 1200);
-  const countRevenue = useCountUp(totalRevenueAmount, 1500);
+  const [countProducts] = useCountUp(activeProductsCount, 1.0);
+  const [countOrders] = useCountUp(totalOrdersCount, 1.2);
+  const [countRevenue] = useCountUp(totalRevenueAmount, 1.5);
 
   useEffect(() => {
     let isMounted = true;
@@ -81,22 +81,31 @@ export const FarmerDashboard = () => {
     const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (isReduced || loading || !containerRef.current) return;
 
+    const statItems = containerRef.current.querySelectorAll('.kc-dash-stat-item');
+    const cardItems = containerRef.current.querySelectorAll('.kc-dash-card-animate');
+
+    if (statItems.length === 0 && cardItems.length === 0) return;
+
     const ctx = gsap.context(() => {
-      gsap.from('.kc-dash-stat-item', {
-        opacity: 0,
-        y: 20,
-        duration: 0.5,
-        stagger: 0.1,
-        ease: 'power2.out',
-      });
-      gsap.from('.kc-dash-card-animate', {
-        opacity: 0,
-        y: 25,
-        duration: 0.6,
-        stagger: 0.15,
-        ease: 'power2.out',
-        delay: 0.2,
-      });
+      if (statItems.length > 0) {
+        gsap.from(statItems, {
+          opacity: 0,
+          y: 20,
+          duration: 0.5,
+          stagger: 0.1,
+          ease: 'power2.out',
+        });
+      }
+      if (cardItems.length > 0) {
+        gsap.from(cardItems, {
+          opacity: 0,
+          y: 25,
+          duration: 0.6,
+          stagger: 0.15,
+          ease: 'power2.out',
+          delay: 0.2,
+        });
+      }
     }, containerRef);
 
     return () => ctx.revert();

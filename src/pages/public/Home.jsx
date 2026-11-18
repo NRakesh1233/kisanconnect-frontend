@@ -95,47 +95,63 @@ export const Home = () => {
     };
   }, []);
 
-  // GSAP Entrance and ScrollTrigger Animations
+  // GSAP Entrance and ScrollTrigger Animations for static hero & feature sections
   useScrollAnimation((gsap) => {
     // Hero Entrance
-    gsap.from('.kc-hero-anim-item', {
-      y: 35,
-      opacity: 0,
-      duration: 0.85,
-      stagger: 0.12,
-      ease: 'power3.out',
-    });
+    const heroElements = document.querySelectorAll('.kc-hero-anim-item');
+    if (heroElements.length > 0) {
+      gsap.from(heroElements, {
+        y: 35,
+        opacity: 0,
+        duration: 0.85,
+        stagger: 0.12,
+        ease: 'power3.out',
+      });
+    }
 
     // Features Stagger
     if (featuresRef.current) {
-      gsap.from('.kc-feature-card-anim', {
-        scrollTrigger: {
-          trigger: featuresRef.current,
-          start: 'top 85%',
-        },
-        y: 40,
-        opacity: 0,
-        duration: 0.7,
-        stagger: 0.15,
-        ease: 'power2.out',
-      });
-    }
-
-    // Products Stagger
-    if (productsRef.current) {
-      gsap.from('.kc-product-card-anim', {
-        scrollTrigger: {
-          trigger: productsRef.current,
-          start: 'top 85%',
-        },
-        y: 35,
-        opacity: 0,
-        duration: 0.7,
-        stagger: 0.12,
-        ease: 'power2.out',
-      });
+      const featCards = featuresRef.current.querySelectorAll('.kc-feature-card-anim');
+      if (featCards.length > 0) {
+        gsap.from(featCards, {
+          scrollTrigger: {
+            trigger: featuresRef.current,
+            start: 'top 85%',
+          },
+          y: 40,
+          opacity: 0,
+          duration: 0.7,
+          stagger: 0.15,
+          ease: 'power2.out',
+        });
+      }
     }
   }, []);
+
+  // Products Stagger: executes safely when featured products have finished loading and exist in DOM
+  useEffect(() => {
+    const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (isReduced || loading || !productsRef.current) return;
+
+    const prodCards = productsRef.current.querySelectorAll('.kc-product-card-anim');
+    if (prodCards.length > 0) {
+      const ctx = gsap.context(() => {
+        gsap.from(prodCards, {
+          scrollTrigger: {
+            trigger: productsRef.current,
+            start: 'top 85%',
+          },
+          y: 35,
+          opacity: 0,
+          duration: 0.7,
+          stagger: 0.12,
+          ease: 'power2.out',
+        });
+      }, productsRef);
+
+      return () => ctx.revert();
+    }
+  }, [loading, featuredProducts]);
 
   const currentSlide = HERO_SLIDES[activeSlide];
 

@@ -42,7 +42,9 @@ api.interceptors.response.use(
     const originalRequest = error.config;
     const status = error.response ? error.response.status : null;
 
-    if ((status === 401 || status === 403) && !originalRequest._retry) {
+    // Only 401 Unauthorized indicates an expired access token that can be refreshed.
+    // 403 Forbidden indicates permission/role rejection which should reject directly.
+    if (status === 401 && !originalRequest._retry) {
       // If a refresh is already in progress, queue this request
       if (isRefreshing) {
         return new Promise((resolve, reject) => {

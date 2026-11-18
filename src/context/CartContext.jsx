@@ -1,11 +1,18 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import customerService from '../services/customerService';
+import { AuthContext } from './AuthContext';
+import { ROLES } from '../utils/constants';
 
 export const CartContext = createContext(null);
 
 const CART_STORAGE_KEY = 'kisanconnect_cart';
 
 export const CartProvider = ({ children }) => {
+  const auth = useContext(AuthContext);
+  const token = auth?.token;
+  const role = auth?.role;
+  const authLoading = auth?.loading;
+
   const [cartItems, setCartItems] = useState(() => {
     try {
       const saved = localStorage.getItem(CART_STORAGE_KEY);
@@ -14,9 +21,9 @@ export const CartProvider = ({ children }) => {
       return [];
     }
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  // Sync cart items to localStorage for persistence
+  // Sync cart items to localStorage for instant persistence
   useEffect(() => {
     try {
       localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
@@ -25,10 +32,17 @@ export const CartProvider = ({ children }) => {
     }
   }, [cartItems]);
 
-  // Fetch cart items from database
+  // Fetch cart items from database ONLY when authenticated as a CUSTOMER
   const fetchCart = useCallback(async () => {
-    const token = localStorage.getItem('Authorization') || localStorage.getItem('token');
-    if (!token) {
+    // If auth state is still restoring, wait
+    if (authLoading) return;
+
+    // Verify token and role from both context and localStorage
+    const currentToken = token || localStorage.getItem('Authorization') || localStorage.getItem('token');
+    const currentRole = (role || localStorage.getItem('role') || '').toUpperCase();
+
+    // Do NOT call customer cart endpoint for unauthenticated users or non-customer roles (e.g. Farmers)
+    if (!currentToken || currentRole !== ROLES.CUSTOMER) {
       setLoading(false);
       return;
     }
@@ -56,85 +70,172 @@ export const CartProvider = ({ children }) => {
       }));
       setCartItems(mappedItems);
     } catch (err) {
-      console.warn('Could not fetch cart items (user may need to login):', err);
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        // Gracefully handle unauthenticated/forbidden without throwing unhandled console errors
+        console.info('Cart sync skipped: session unauthorized or role mismatch.');
+      } else {
+        console.warn('Could not fetch cart items:', err.message);
+      }
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [authLoading, token, role]);
 
+  // Sync cart whenever auth state finishes loading or when role changes
   useEffect(() => {
-    fetchCart();
-  }, [fetchCart]);
+    if (!authLoading) {
+      const currentToken = token || localStorage.getItem('Authorization') || localStorage.getItem('token');
+      const currentRole = (role || localStorage.getItem('role') || '').toUpperCase();
 
-  // Add item to cart
+      if (currentToken && currentRole === ROLES.CUSTOMER) {
+        fetchCart();
+      } else {
+        setLoading(false);
+      }
+    }
+  }, [authLoading, token, role, fetchCart]);
+
+  // Add item to cart (supports both guest localStorage and authenticated customer backend sync)
   const addToCart = async (product, quantity = 1) => {
-    try {
-      const prodPrice = Number(product.price) || Number(product.productPrice) || 0;
-      const qty = Number(quantity) || 1;
+    const prodPrice = Number(product.price) || Number(product.productPrice) || 0;
+    const qty = Number(quantity) || 1;
+    const prodId = product.productId || product.id;
 
-      const payload = {
-        productId: product.productId || product.id,
-        cartPrice: prodPrice,
-        quantity: qty,
-        totalPrice: prodPrice * qty,
-      };
+    const currentToken = token || localStorage.getItem('Authorization') || localStorage.getItem('token');
+    const currentRole = (role || localStorage.getItem('role') || '').toUpperCase();
+    const canSyncBackend = Boolean(currentToken && currentRole === ROLES.CUSTOMER);
 
-      const response = await customerService.addToCart(payload);
-      await fetchCart();
-      return `${product.productName || product.name || 'Item'} ${response || 'added to cart'}!`;
-    } catch (err) {
-      console.error('Failed to add item to database cart:', err);
-      throw err;
+    if (canSyncBackend) {
+      try {
+        const payload = {
+          productId: prodId,
+          cartPrice: prodPrice,
+          quantity: qty,
+          totalPrice: prodPrice * qty,
+        };
+
+        const response = await customerService.addToCart(payload);
+        await fetchCart();
+        return `${product.productName || product.name || 'Item'} ${response || 'added to cart'}!`;
+      } catch (err) {
+        console.error('Failed to add item to database cart:', err);
+        throw err;
+      }
+    } else {
+      // Local / guest mode: persist directly to localStorage
+      setCartItems((prevItems) => {
+        const existingIndex = prevItems.findIndex((it) => (it.productId || it.id) === prodId);
+        if (existingIndex > -1) {
+          const updated = [...prevItems];
+          const newQty = (updated[existingIndex].quantity || 1) + qty;
+          updated[existingIndex] = {
+            ...updated[existingIndex],
+            quantity: newQty,
+            totalPrice: prodPrice * newQty,
+          };
+          return updated;
+        } else {
+          return [
+            ...prevItems,
+            {
+              id: prodId,
+              productId: prodId,
+              cartId: `local-${Date.now()}`,
+              name: product.productName || product.name,
+              productName: product.productName || product.name,
+              price: prodPrice,
+              quantity: qty,
+              totalPrice: prodPrice * qty,
+              image: product.image || product.productImage,
+              imageUrl: product.image || product.productImage,
+              category: product.category,
+              unit: product.unit || 'kg',
+              availableStock: Number(product.stock || product.totalStock) || 999,
+              farmerId: product.farmerId,
+              farmerName: product.farmerName,
+              farmerProfilePic: product.profilePic || product.farmerProfilePic,
+            },
+          ];
+        }
+      });
+      return `${product.productName || product.name || 'Item'} added to cart!`;
     }
   };
 
   // Update item quantity in cart
   const updateQuantity = async (cartId, newQuantity) => {
-    try {
-      const targetItem = cartItems.find((item) => item.cartId === cartId);
-      if (!targetItem) return;
+    const targetItem = cartItems.find((item) => item.cartId === cartId);
+    if (!targetItem) return;
 
-      if (newQuantity <= 0) {
-        await removeFromCart(cartId);
-        return;
+    if (newQuantity <= 0) {
+      await removeFromCart(cartId);
+      return;
+    }
+
+    const currentToken = token || localStorage.getItem('Authorization') || localStorage.getItem('token');
+    const currentRole = (role || localStorage.getItem('role') || '').toUpperCase();
+    const canSyncBackend = Boolean(currentToken && currentRole === ROLES.CUSTOMER && !String(cartId).startsWith('local-'));
+
+    if (canSyncBackend) {
+      try {
+        await customerService.updateCartQuantity(cartId, {
+          productId: Number(targetItem.id || targetItem.productId) || 0,
+          cartPrice: Number(targetItem.price) || 0,
+          quantity: Number(newQuantity),
+          totalPrice: (Number(targetItem.price) || 0) * Number(newQuantity),
+        });
+        await fetchCart();
+      } catch (err) {
+        console.error('Failed to update quantity in database:', err);
+        throw err;
       }
-
-      await customerService.updateCartQuantity(cartId, {
-        productId: Number(targetItem.id || targetItem.productId) || 0,
-        cartPrice: Number(targetItem.price) || 0,
-        quantity: Number(newQuantity),
-        totalPrice: (Number(targetItem.price) || 0) * Number(newQuantity),
-      });
-
-      await fetchCart();
-    } catch (err) {
-      console.error('Failed to update quantity in database:', err);
-      throw err;
+    } else {
+      setCartItems((prevItems) =>
+        prevItems.map((item) =>
+          item.cartId === cartId
+            ? { ...item, quantity: newQuantity, totalPrice: (Number(item.price) || 0) * newQuantity }
+            : item
+        )
+      );
     }
   };
 
   // Remove item from cart
   const removeFromCart = async (cartId) => {
-    try {
-      const response = await customerService.removeFromCart(cartId);
-      await fetchCart();
-      return response;
-    } catch (err) {
-      console.error('Failed to remove item from database:', err);
-      throw err;
+    const currentToken = token || localStorage.getItem('Authorization') || localStorage.getItem('token');
+    const currentRole = (role || localStorage.getItem('role') || '').toUpperCase();
+    const canSyncBackend = Boolean(currentToken && currentRole === ROLES.CUSTOMER && !String(cartId).startsWith('local-'));
+
+    if (canSyncBackend) {
+      try {
+        const response = await customerService.removeFromCart(cartId);
+        await fetchCart();
+        return response;
+      } catch (err) {
+        console.error('Failed to remove item from database:', err);
+        throw err;
+      }
+    } else {
+      setCartItems((prevItems) => prevItems.filter((item) => item.cartId !== cartId));
+      return 'Item removed';
     }
   };
 
   // Clear entire cart
   const clearCart = async () => {
-    try {
-      await customerService.clearCart();
-      setCartItems([]);
-      localStorage.removeItem(CART_STORAGE_KEY);
-    } catch (err) {
-      console.error('Failed to clear database cart:', err);
-      throw err;
+    const currentToken = token || localStorage.getItem('Authorization') || localStorage.getItem('token');
+    const currentRole = (role || localStorage.getItem('role') || '').toUpperCase();
+    const canSyncBackend = Boolean(currentToken && currentRole === ROLES.CUSTOMER);
+
+    if (canSyncBackend) {
+      try {
+        await customerService.clearCart();
+      } catch (err) {
+        console.warn('Backend clear cart error:', err);
+      }
     }
+    setCartItems([]);
+    localStorage.removeItem(CART_STORAGE_KEY);
   };
 
   const totalItemsCount = cartItems.reduce((acc, item) => acc + (Number(item.quantity) || 0), 0);

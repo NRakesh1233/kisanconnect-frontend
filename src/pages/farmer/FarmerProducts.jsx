@@ -137,22 +137,31 @@ export const FarmerProducts = () => {
     const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (isReduced || loading || !containerRef.current) return;
 
+    const statCards = containerRef.current.querySelectorAll('.kc-inv-stat-card');
+    const invItems = containerRef.current.querySelectorAll('.kc-inv-item');
+
+    if (statCards.length === 0 && invItems.length === 0) return;
+
     const ctx = gsap.context(() => {
-      gsap.from('.kc-inv-stat-card', {
-        opacity: 0,
-        y: 15,
-        duration: 0.45,
-        stagger: 0.08,
-        ease: 'power2.out',
-      });
-      gsap.from('.kc-inv-item', {
-        opacity: 0,
-        y: 20,
-        duration: 0.45,
-        stagger: 0.06,
-        ease: 'power2.out',
-        delay: 0.15,
-      });
+      if (statCards.length > 0) {
+        gsap.from(statCards, {
+          opacity: 0,
+          y: 15,
+          duration: 0.45,
+          stagger: 0.08,
+          ease: 'power2.out',
+        });
+      }
+      if (invItems.length > 0) {
+        gsap.from(invItems, {
+          opacity: 0,
+          y: 20,
+          duration: 0.45,
+          stagger: 0.06,
+          ease: 'power2.out',
+          delay: 0.15,
+        });
+      }
     }, containerRef);
 
     return () => ctx.revert();
