@@ -9,7 +9,10 @@ import { useCountUp } from '../../hooks/useCountUp';
 import { useScrollAnimation } from '../../hooks/useScrollAnimation';
 import { resolveProfileImageUrl } from '../../utils/formatters';
 import './Home.css';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
+gsap.registerPlugin(ScrollTrigger);
 const HERO_SLIDES = [
   {
     badge: '100% Organic & Chemical-Free',
