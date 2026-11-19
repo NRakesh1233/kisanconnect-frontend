@@ -13,6 +13,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
+
 const HERO_SLIDES = [
   {
     badge: '100% Organic & Chemical-Free',
@@ -48,16 +49,38 @@ export const Home = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [farmers, setFarmers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showFarmerAlert, setShowFarmerAlert] = useState(false);
 
   const heroRef = useRef(null);
   const featuresRef = useRef(null);
   const productsRef = useRef(null);
+  const alertTimerRef = useRef(null);
 
   // Animated metrics counters
   const [familiesCount, familiesRef] = useCountUp(10000, 2);
   const [farmersCount, farmersStatRef] = useCountUp(500, 2);
   const [organicPercent, organicRef] = useCountUp(100, 1.5);
   const [speedHours, speedRef] = useCountUp(24, 1.5);
+
+  const isFarmerAccount = () => {
+    const role = localStorage.getItem('role');
+    return typeof role === 'string' && role.trim().toUpperCase() === 'FARMER';
+  };
+
+  const handleRestrictedBuyClick = (e) => {
+    if (!isFarmerAccount()) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+    setShowFarmerAlert(true);
+
+    if (alertTimerRef.current) {
+      clearTimeout(alertTimerRef.current);
+    }
+    alertTimerRef.current = setTimeout(() => {
+      setShowFarmerAlert(false);
+    }, 6000);
+  };
 
   // Fetch real backend data
   useEffect(() => {
@@ -95,6 +118,9 @@ export const Home = () => {
     return () => {
       isMounted = false;
       clearInterval(slideTimer);
+      if (alertTimerRef.current) {
+        clearTimeout(alertTimerRef.current);
+      }
     };
   }, []);
 
@@ -162,13 +188,53 @@ export const Home = () => {
     <div className="kc-home-wrapper min-vh-100 d-flex flex-column">
       <Navbar />
 
+      {showFarmerAlert && (
+        <div
+          className="position-fixed top-0 end-0 p-3"
+          style={{ zIndex: 1090, maxWidth: '450px', width: '100%', marginTop: '80px' }}
+        >
+          <div
+            className="alert alert-warning alert-dismissible fade show shadow-lg border-0 rounded-4 p-3 mb-0"
+            role="alert"
+            style={{
+              background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
+              borderLeft: '5px solid #d97706',
+              color: '#78350f',
+            }}
+          >
+            <div className="d-flex align-items-start gap-3 pe-3">
+              <i className="bi bi-exclamation-triangle-fill fs-4 text-warning flex-shrink-0 mt-1"></i>
+              <div>
+                <div className="fw-bold mb-1">Farmer Account Restriction</div>
+                <div className="small mb-2">
+                  Farmer accounts don&apos;t have access to buy products. Please create another <strong>Customer</strong> account to purchase.
+                </div>
+                <Link
+                  to="/register"
+                  className="btn btn-sm btn-warning fw-semibold rounded-pill px-3"
+                  onClick={() => setShowFarmerAlert(false)}
+                >
+                  Create Customer Account
+                </Link>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="btn-close"
+              aria-label="Close"
+              onClick={() => setShowFarmerAlert(false)}
+            ></button>
+          </div>
+        </div>
+      )}
+
       <main className="flex-grow-1" style={{ paddingTop: '95px' }}>
         {/* Ambient Decorative Glows */}
         <div className="kc-ambient-blob kc-ambient-blob-1"></div>
         <div className="kc-ambient-blob kc-ambient-blob-2"></div>
 
         {/* ========================================================
-            1. HERO SECTION (Figma Aligned Carousel)
+1. HERO SECTION (Figma Aligned Carousel)
             ======================================================== */}
         <section className="kc-container pt-3 pt-md-4 mb-5" ref={heroRef}>
           <div className="kc-hero-banner">
@@ -220,7 +286,7 @@ export const Home = () => {
           </div>
 
           {/* ========================================================
-              2. ANIMATED METRICS STRIP (useCountUp)
+2. ANIMATED METRICS STRIP (useCountUp)
               ======================================================== */}
           <div className="kc-metrics-strip mx-3 mx-md-4">
             <div className="row g-4 text-center text-md-start">
@@ -276,7 +342,7 @@ export const Home = () => {
         </section>
 
         {/* ========================================================
-            3. FEATURED HARVESTS (ProductCard Integration)
+3. FEATURED HARVESTS (ProductCard Integration)
             ======================================================== */}
         <section className="kc-section kc-container" ref={productsRef}>
           <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4 gap-3">
@@ -290,7 +356,11 @@ export const Home = () => {
               </p>
             </div>
 
-            <Link to="/products" className="kc-btn kc-btn-outline kc-btn-sm align-self-start align-self-md-auto">
+            <Link
+              to="/products"
+              onClick={handleRestrictedBuyClick}
+              className="kc-btn kc-btn-outline kc-btn-sm align-self-start align-self-md-auto"
+            >
               <span>View Full Catalog</span>
               <i className="bi bi-arrow-right"></i>
             </Link>
@@ -311,7 +381,11 @@ export const Home = () => {
           ) : featuredProducts.length > 0 ? (
             <div className="row g-4">
               {featuredProducts.map((prod) => (
-                <div key={prod.productId || prod.id} className="col-6 col-lg-3 kc-product-card-anim">
+                <div
+                  key={prod.productId || prod.id}
+                  className="col-6 col-lg-3 kc-product-card-anim"
+                  onClickCapture={handleRestrictedBuyClick}
+                >
                   <ProductCard product={prod} />
                 </div>
               ))}
@@ -321,7 +395,11 @@ export const Home = () => {
               <i className="bi bi-basket text-muted display-4 d-block mb-3"></i>
               <h5 className="fw-bold text-dark">Fresh Batches Coming Soon</h5>
               <p className="text-muted small">Our farmers are currently preparing today's morning harvest.</p>
-              <Link to="/products" className="kc-btn kc-btn-primary kc-btn-sm d-inline-flex mt-2">
+              <Link
+                to="/products"
+                onClick={handleRestrictedBuyClick}
+                className="kc-btn kc-btn-primary kc-btn-sm d-inline-flex mt-2"
+              >
                 Browse Marketplace
               </Link>
             </div>
@@ -329,7 +407,7 @@ export const Home = () => {
         </section>
 
         {/* ========================================================
-            4. WHY CHOOSE KISANCONNECT (Value Propositions)
+4. WHY CHOOSE KISANCONNECT (Value Propositions)
             ======================================================== */}
         <section className="kc-section" style={{ backgroundColor: 'var(--kc-beige)' }} ref={featuresRef}>
           <div className="kc-container">
@@ -396,7 +474,7 @@ export const Home = () => {
         </section>
 
         {/* ========================================================
-            5. MEET OUR DEDICATED FARMERS
+5. MEET OUR DEDICATED FARMERS
             ======================================================== */}
         <section className="kc-section kc-container">
           <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4 gap-3">
@@ -410,7 +488,11 @@ export const Home = () => {
               </p>
             </div>
 
-            <Link to="/products/farmer" className="kc-btn kc-btn-outline kc-btn-sm align-self-start align-self-md-auto">
+            <Link
+              to="/products/farmer"
+              onClick={handleRestrictedBuyClick}
+              className="kc-btn kc-btn-outline kc-btn-sm align-self-start align-self-md-auto"
+            >
               <span>View All Farmers</span>
               <i className="bi bi-arrow-right"></i>
             </Link>
@@ -456,6 +538,7 @@ export const Home = () => {
 
                           <Link
                             to={`/customer/products/farmer/${fid}`}
+                            onClick={handleRestrictedBuyClick}
                             className="kc-btn kc-btn-sm kc-btn-cream text-decoration-none"
                           >
                             <span>Visit Store</span>
@@ -478,7 +561,7 @@ export const Home = () => {
         </section>
 
         {/* ========================================================
-            6. CALL TO ACTION BANNER
+6. CALL TO ACTION BANNER
             ======================================================== */}
         <section className="kc-container pb-5 mb-5">
           <div className="kc-cta-banner">
