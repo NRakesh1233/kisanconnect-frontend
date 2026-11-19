@@ -114,7 +114,6 @@ export const Home = () => {
     const slideTimer = setInterval(() => {
       setActiveSlide((prev) => (prev + 1) % HERO_SLIDES.length);
     }, 6500);
-
     return () => {
       isMounted = false;
       clearInterval(slideTimer);

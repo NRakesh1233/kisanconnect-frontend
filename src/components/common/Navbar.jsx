@@ -8,7 +8,10 @@ import { resolveProfileImageUrl } from '../../utils/formatters';
 import './Navbar.css';
 
 export const Navbar = () => {
-  const { user, role, isAuthenticated, isFarmer, isCustomer, logout } = useAuth();
+  const auth = useAuth();
+  const { user, role, isAuthenticated, isFarmer, isCustomer, logout } = auth;
+  const isUserLoading = Boolean(auth?.loading || (isAuthenticated && !user));
+
   const { totalItemsCount } = useCart();
   const { wishlistCount } = useWishlist();
   const navigate = useNavigate();
@@ -32,8 +35,8 @@ export const Navbar = () => {
     navigate('/login');
   };
 
-  const profileImg = resolveProfileImageUrl(user?.profilePic || user?.image);
-  const userInitial = user?.name ? user.name.charAt(0).toUpperCase() : 'U';
+  const profileImg = !isUserLoading ? resolveProfileImageUrl(user?.profilePic || user?.image) : '';
+  const userInitial = !isUserLoading && user?.name ? user.name.charAt(0).toUpperCase() : '';
 
   // Navigation Items per Role
   const renderNavLinks = () => {
@@ -138,14 +141,27 @@ export const Navbar = () => {
                 type="button"
                 onClick={() => setDropdownOpen(!dropdownOpen)}
               >
-                {profileImg ? (
+                {isUserLoading ? (
+                  <div
+                    className="kc-avatar-initials d-flex align-items-center justify-content-center"
+                    aria-label="Loading profile"
+                  >
+                    <span
+                      className="spinner-border spinner-border-sm text-success"
+                      role="status"
+                    ></span>
+                  </div>
+                ) : profileImg ? (
                   <img src={profileImg} alt="Avatar" className="kc-avatar-img" />
                 ) : (
-                  <div className="kc-avatar-initials">{userInitial}</div>
+                  <div className="kc-avatar-initials">{userInitial || null}</div>
                 )}
-                <span className="d-none d-md-inline fw-semibold small text-dark">
-                  {user?.name?.split(' ')[0] || (isFarmer ? 'Farmer' : 'Customer')}
-                </span>
+
+                {!isUserLoading && (
+                  <span className="d-none d-md-inline fw-semibold small text-dark">
+                    {user?.name?.split(' ')[0] || (isFarmer ? 'Farmer' : 'Customer')}
+                  </span>
+                )}
               </button>
 
               {dropdownOpen && (
@@ -154,9 +170,11 @@ export const Navbar = () => {
                   onMouseLeave={() => setDropdownOpen(false)}
                 >
                   <div className="px-3 py-2 border-bottom mb-1">
-                    <p className="fw-bold mb-0 text-dark small">{user?.name || 'User Account'}</p>
+                    <p className="fw-bold mb-0 text-dark small">
+                      {isUserLoading ? 'Loading...' : user?.name || ''}
+                    </p>
                     <span className="text-muted small" style={{ fontSize: '0.75rem' }}>
-                      {role} Account
+                      {role ? `${role} Account` : ''}
                     </span>
                   </div>
 
