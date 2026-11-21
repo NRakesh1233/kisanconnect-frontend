@@ -40,7 +40,7 @@ export const AuthLayout = () => {
 
             {/* Middle Feature Highlights */}
             <div className="position-relative z-1 my-5" style={{ maxWidth: '480px' }}>
-              <span className="badge kc-badge-organic mb-3">
+              <span className="badge kc-badge-organic text-dark mb-3">
                 <i className="bi bi-stars"></i> Direct Farm-to-Table Marketplace
               </span>
               <h1 className="display-6 fw-extrabold mb-3 text-white">

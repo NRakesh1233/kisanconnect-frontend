@@ -488,7 +488,7 @@ export const Home = () => {
             </div>
 
             <Link
-              to="/products/farmer"
+              to="/customer/farmers"
               onClick={handleRestrictedBuyClick}
               className="kc-btn kc-btn-outline kc-btn-sm align-self-start align-self-md-auto"
             >
@@ -500,7 +500,7 @@ export const Home = () => {
           <div className="row g-4">
             {farmers.length > 0 ? (
               farmers.map((farmer) => {
-                const fid = farmer.id || farmer.farmerId;
+                const fid = farmer.Id || farmer.farmerId;
                 const avatar = resolveProfileImageUrl(farmer.profilePic || farmer.image);
 
                 return (
@@ -521,7 +521,7 @@ export const Home = () => {
                       <div className="kc-farmer-preview-body">
                         <div className="d-flex justify-content-between align-items-center mb-1">
                           <h5 className="fw-bold text-dark mb-0">{farmer.name || 'Dedicated Farmer'}</h5>
-                          <span className="badge kc-badge-organic small">Verified</span>
+                          <span className="badge kc-badge-organic text-dark small  text-dark">Verified</span>
                         </div>
 
                         <p className="text-muted small mb-3">
@@ -566,7 +566,7 @@ export const Home = () => {
           <div className="kc-cta-banner">
             <div className="row align-items-center g-4">
               <div className="col-lg-8">
-                <span className="badge kc-badge-organic mb-3">Join 10,000+ Conscious Households</span>
+                <span className="badge kc-badge-organic text-dark mb-3">Join 10,000+ Conscious Households</span>
                 <h2 className="display-6 fw-extrabold text-white mb-3">
                   Ready for Pure, Unadulterated Farm Produce?
                 </h2>

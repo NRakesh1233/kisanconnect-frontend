@@ -390,7 +390,7 @@ export const FarmerProducts = () => {
 
                     {/* Organic Badge */}
                     {item.organic && (
-                      <span className="badge kc-badge-organic position-absolute top-0 start-0 m-3 shadow-sm">
+                      <span className="badge kc-badge-organic text-dark position-absolute top-0 start-0 m-3 shadow-sm">
                         <i className="bi bi-patch-check-fill me-1"></i> Organic
                       </span>
                     )}

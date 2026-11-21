@@ -202,7 +202,7 @@ export const FarmerEarnings = () => {
                   alt={currentProduct?.productName}
                   className="w-100 h-100 object-fit-cover"
                 />
-                <span className="badge kc-badge-organic position-absolute top-0 start-0 m-3 shadow-sm">
+                <span className="badge kc-badge-organic text-dark position-absolute top-0 start-0 m-3 shadow-sm">
                   ID: #{pid}
                 </span>
                 {currentProduct?.organic && (
@@ -367,7 +367,7 @@ export const FarmerEarnings = () => {
           <div className="kc-card p-4 shadow-sm h-100 d-flex flex-column">
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h5 className="fw-bold text-dark mb-0">Harvest Reviews</h5>
-              <span className="badge kc-badge-organic">{reviewsList.length}</span>
+              <span className="badge kc-badge-organic text-dark">{reviewsList.length}</span>
             </div>
 
             <div

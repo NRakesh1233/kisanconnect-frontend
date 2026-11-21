@@ -194,7 +194,7 @@ export const ProductDetails = () => {
               {/* Badges on Image */}
               <div className="position-absolute top-0 start-0 m-3 d-flex flex-column gap-2">
                 {organic && (
-                  <span className="kc-badge kc-badge-organic">
+                  <span className="kc-badge kc-badge-organic text-dark">
                     <i className="bi bi-patch-check-fill"></i> 100% Organic
                   </span>
                 )}

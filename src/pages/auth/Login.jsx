@@ -128,7 +128,7 @@ export const Login = () => {
     >
       {/* Header */}
       <div className="mb-4">
-        <span className="badge kc-badge-organic mb-2">
+        <span className="badge kc-badge-organic text-dark mb-2">
           Welcome Back
         </span>
 

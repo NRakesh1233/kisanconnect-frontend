@@ -179,7 +179,7 @@
   text-transform: uppercase;
 }
 
-.kc-badge-organic {
+.kc-badge-organic text-dark {
   background-color: var(--kc-fresh-green-light);
   color: var(--kc-fresh-green);
   border: 1px solid rgba(79, 138, 85, 0.25);

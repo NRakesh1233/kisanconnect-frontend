@@ -185,7 +185,7 @@ export const CustomerProfile = () => {
             </h5>
             <span className="text-muted small d-block mb-3">{profile.email}</span>
 
-            <span className="badge kc-badge-organic mb-4">Verified Customer</span>
+            <span className="badge kc-badge-organic text-dark mb-4">Verified Customer</span>
 
             {/* Quick Navigation List */}
             <div className="d-flex flex-column gap-2 text-start pt-3 border-top">
@@ -260,7 +260,7 @@ export const CustomerProfile = () => {
 
                 <div className="col-sm-6">
                   <label className="kc-label small text-muted">Account Classification</label>
-                  <span className="badge kc-badge-organic">CUSTOMER</span>
+                  <span className="badge kc-badge-organic text-dark">CUSTOMER</span>
                 </div>
               </div>
             </div>

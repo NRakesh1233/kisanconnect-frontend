@@ -157,7 +157,7 @@ export const ProductCard = ({ product }) => {
         {/* Floating Badges */}
         <div className="kc-card-badges">
           {organic && (
-            <span className="kc-badge kc-badge-organic">
+            <span className="kc-badge kc-badge-organic text-dark">
               <i className="bi bi-patch-check-fill"></i> Organic
             </span>
           )}

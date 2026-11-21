@@ -129,7 +129,7 @@ export const Footer = () => {
               Join over 10,000+ households receiving verified direct-from-soil agricultural produce every week.
             </p>
             <div className="p-3 rounded-3" style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }}>
-              <span className="badge kc-badge-organic mb-1 text-dark">Zero Middlemen</span>
+              <span className="badge kc-badge-organic text-dark mb-1 text-dark">Zero Middlemen</span>
               <p className="small text-white-50 mb-0">100% of purchase proceeds directly support sustainable family farming.</p>
             </div>
           </div>

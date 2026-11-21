@@ -129,7 +129,7 @@ export const FarmerDashboard = () => {
       >
         <div className="row align-items-center g-4 position-relative z-1">
           <div className="col-lg-8">
-            <span className="badge kc-badge-organic mb-3">
+            <span className="badge kc-badge-organic text-dark mb-3">
               <i className="bi bi-patch-check-fill me-1"></i> Verified Agricultural Partner
             </span>
             <h1 className="display-6 fw-extrabold text-white mb-2">
@@ -337,7 +337,7 @@ export const FarmerDashboard = () => {
                     {recentOrders.map((ord) => {
                       const st = (ord.orderStatus || ord.status || 'PENDING').toUpperCase();
                       const config = ORDER_STATUS_CONFIG[st] || {
-                        badgeClass: 'kc-badge-organic',
+                        badgeClass: 'kc-badge-organic text-dark',
                         label: st,
                         icon: 'bi-clock',
                       };

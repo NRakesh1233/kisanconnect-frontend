@@ -57,7 +57,7 @@ export const CustomerHome = () => {
       >
         <div className="row align-items-center g-4 position-relative z-1">
           <div className="col-lg-8">
-            <span className="badge kc-badge-organic mb-3">
+            <span className="badge kc-badge-organic text-dark mb-3">
               <i className="bi bi-patch-check-fill"></i> Fresh Morning Harvests Available
             </span>
             <h1 className="display-6 fw-extrabold text-white mb-3">
@@ -164,7 +164,7 @@ export const CustomerHome = () => {
 
         <div className="row g-4">
           {farmers.map((farmer) => {
-            const fid = farmer.id || farmer.farmerId;
+            const fid = farmer.Id || farmer.farmerId;
             const avatar = resolveProfileImageUrl(farmer.profilePic || farmer.image);
 
             return (
@@ -200,7 +200,7 @@ export const CustomerHome = () => {
                   </p>
 
                   <div className="pt-3 border-top d-flex justify-content-between align-items-center">
-                    <span className="badge kc-badge-organic">
+                    <span className="badge kc-badge-organic text-dark">
                       <i className="bi bi-check-circle-fill"></i> Certified Grower
                     </span>
                     <Link

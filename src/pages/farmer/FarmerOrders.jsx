@@ -218,7 +218,7 @@ export const FarmerOrders = () => {
             const orderId = ord.orderId || ord.id;
             const status = (ord.orderStatus || ord.status || 'PENDING').toUpperCase();
             const config = ORDER_STATUS_CONFIG[status] || {
-              badgeClass: 'kc-badge-organic',
+              badgeClass: 'kc-badge-organic text-dark',
               label: status,
               icon: 'bi-clock',
             };
@@ -458,7 +458,7 @@ export const FarmerOrders = () => {
                   const oid = ord.orderId || ord.id;
                   const st = (ord.orderStatus || ord.status || 'PENDING').toUpperCase();
                   const config = ORDER_STATUS_CONFIG[st] || {
-                    badgeClass: 'kc-badge-organic',
+                    badgeClass: 'kc-badge-organic text-dark',
                     label: st,
                     icon: 'bi-clock',
                   };

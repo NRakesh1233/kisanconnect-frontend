@@ -30,7 +30,7 @@ export const Farmers = () => {
         const counts = {};
         await Promise.all(
           farmersList.map(async (farmer) => {
-            const fid = farmer.id || farmer.farmerId;
+            const fid = farmer.Id || farmer.farmerId;
             if (fid) {
               try {
                 const prods = await productService.getProductsByFarmer(fid);
@@ -120,7 +120,7 @@ export const Farmers = () => {
       ) : farmers.length > 0 ? (
         <div className="row g-4" ref={gridRef}>
           {farmers.map((farmer) => {
-            const fid = farmer.id || farmer.farmerId;
+            const fid = farmer.Id || farmer.farmerId;
             const avatar = resolveProfileImageUrl(farmer.profilePic || farmer.image);
             const count = productCounts[fid] !== undefined ? productCounts[fid] : 0;
 
@@ -168,7 +168,7 @@ export const Farmers = () => {
                   </div>
 
                   <div className="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
-                    <span className="badge kc-badge-organic small">Verified Farmer</span>
+                    <span className="badge kc-badge-organic text-dark text-dark small">Verified Farmer</span>
                     <Link
                       to={`/customer/products/farmer/${fid}`}
                       className="kc-btn kc-btn-sm kc-btn-primary text-decoration-none"

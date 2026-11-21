@@ -54,7 +54,7 @@ export const FarmerLayout = () => {
               </button>
 
               <div>
-                <span className="badge kc-badge-organic d-none d-sm-inline-flex mb-1">
+                <span className="badge kc-badge-organic text-dark d-none d-sm-inline-flex mb-1">
                   <i className="bi bi-patch-check-fill me-1"></i> Active Harvest Hub
                 </span>
                 <h5 className="fw-bold text-dark mb-0 d-none d-sm-block">Farmer Management Portal</h5>

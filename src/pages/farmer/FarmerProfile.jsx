@@ -170,7 +170,7 @@ export const FarmerProfile = () => {
           </div>
 
           <div className="col">
-            <span className="badge kc-badge-organic mb-2">
+            <span className="badge kc-badge-organic text-dark mb-2">
               <i className="bi bi-patch-check-fill me-1"></i> Verified Producer
             </span>
             <h2 className="fw-extrabold text-white mb-1">
@@ -322,7 +322,7 @@ export const FarmerProfile = () => {
                 Direct buyer feedback on your harvests across India.
               </p>
             </div>
-            <span className="badge kc-badge-organic">{reviews.length} Total Reviews</span>
+            <span className="badge kc-badge-organic text-dark">{reviews.length} Total Reviews</span>
           </div>
 
           {reviews.length === 0 ? (

@@ -118,7 +118,7 @@ export const Register = () => {
 
       {/* Header */}
       <div className="mb-4">
-        <span className="badge kc-badge-organic mb-2">Create Account</span>
+        <span className="badge kc-badge-organic text-dark mb-2">Create Account</span>
         <h2 className="fw-extrabold text-dark mb-1" style={{ fontSize: '1.85rem' }}>
           Join KisanConnect
         </h2>

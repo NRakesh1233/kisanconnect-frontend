@@ -26,7 +26,7 @@ export const ORDER_STATUS_CONFIG = {
   ACCEPTED: { label: 'Accepted', badgeClass: 'kc-badge-info', icon: 'bi-check-circle' },
   PACKED: { label: 'Packed', badgeClass: 'kc-badge-info', icon: 'bi-box-seam' },
   SHIPPED: { label: 'Shipped', badgeClass: 'kc-badge-info', icon: 'bi-truck' },
-  DELIVERED: { label: 'Delivered', badgeClass: 'kc-badge-organic', icon: 'bi-patch-check-fill' },
+  DELIVERED: { label: 'Delivered', badgeClass: 'kc-badge-organic text-dark', icon: 'bi-patch-check-fill' },
   REJECTED: { label: 'Rejected', badgeClass: 'kc-badge-danger', icon: 'bi-x-circle' },
   CANCELLED: { label: 'Cancelled', badgeClass: 'kc-badge-danger', icon: 'bi-x-circle' },
 };

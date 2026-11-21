@@ -175,7 +175,7 @@ export const ProductCatalog = () => {
             <div className="d-flex flex-wrap gap-2 align-items-center mb-3">
               <span className="small text-muted me-1">Active Filters:</span>
               {selectedCategory && (
-                <span className="kc-badge kc-badge-organic d-inline-flex align-items-center gap-1">
+                <span className="kc-badge kc-badge-organic text-dark d-inline-flex align-items-center gap-1">
                   Category: {selectedCategory}
                   <i
                     className="bi bi-x-circle cursor-pointer ms-1"
